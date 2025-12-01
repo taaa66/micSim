@@ -35,7 +35,10 @@ import {
   query,
   orderBy,
   limit,
-  getDocs
+  getDocs,
+  increment,
+  arrayUnion,
+  serverTimestamp
 } from 'firebase/firestore';
 
 // Firebase configuration - MicroSim Project
@@ -234,47 +237,145 @@ export function onAuthChange(callback) {
 }
 
 /**
- * Update user stats
+ * Update user stats using ATOMIC operations
+ * This prevents race conditions when multiple updates happen simultaneously
  */
 export async function firebaseUpdateStats(uid, score, moduleId) {
-  if (!isFirebaseAvailable()) return;
+  if (!isFirebaseAvailable()) return null;
   
   try {
-    const userDoc = await getDoc(doc(db, 'users', uid));
-    if (!userDoc.exists()) return;
+    const userRef = doc(db, 'users', uid);
     
-    const data = userDoc.data();
-    const stats = data.stats || {};
-    
-    const newTotalSessions = (stats.totalSessions || 0) + 1;
-    const newTotalScore = (stats.totalScore || 0) + score;
-    const newAverageScore = Math.round(newTotalScore / newTotalSessions);
-    const newHighestScore = Math.max(stats.highestScore || 0, score);
-    
-    let modulesCompleted = stats.modulesCompleted || [];
-    if (moduleId && !modulesCompleted.includes(moduleId)) {
-      modulesCompleted = [...modulesCompleted, moduleId];
+    // First, get current highest score to compare
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      console.error('User document not found:', uid);
+      return null;
     }
     
-    await updateDoc(doc(db, 'users', uid), {
-      'stats.totalSessions': newTotalSessions,
-      'stats.totalScore': newTotalScore,
-      'stats.averageScore': newAverageScore,
-      'stats.highestScore': newHighestScore,
-      'stats.modulesCompleted': modulesCompleted,
-      'stats.lastActive': new Date().toISOString()
-    });
+    const currentData = userDoc.data();
+    const currentHighest = currentData.stats?.highestScore || 0;
+    const currentTotal = currentData.stats?.totalSessions || 0;
+    const currentTotalScore = currentData.stats?.totalScore || 0;
+    
+    // Build atomic update object
+    const updateData = {
+      'stats.totalSessions': increment(1),
+      'stats.totalScore': increment(score),
+      'stats.lastActive': serverTimestamp(),
+      'stats.practice_count': increment(1) // Explicit practice count
+    };
+    
+    // Update highest score only if new score is higher
+    if (score > currentHighest) {
+      updateData['stats.highestScore'] = score;
+    }
+    
+    // Add module to completed list atomically (arrayUnion prevents duplicates)
+    if (moduleId) {
+      updateData['stats.modulesCompleted'] = arrayUnion(moduleId);
+    }
+    
+    // Perform atomic update
+    await updateDoc(userRef, updateData);
+    
+    // Calculate new values for return
+    const newTotalSessions = currentTotal + 1;
+    const newTotalScore = currentTotalScore + score;
+    const newAverageScore = Math.round(newTotalScore / newTotalSessions);
+    const newHighestScore = Math.max(currentHighest, score);
+    
+    // Fetch updated modules list
+    const updatedDoc = await getDoc(userRef);
+    const updatedData = updatedDoc.data();
+    
+    console.log('✅ Stats updated successfully:', { uid, score, moduleId });
     
     return {
       totalSessions: newTotalSessions,
       totalScore: newTotalScore,
       averageScore: newAverageScore,
       highestScore: newHighestScore,
-      modulesCompleted,
+      practice_count: (currentData.stats?.practice_count || 0) + 1,
+      modulesCompleted: updatedData.stats?.modulesCompleted || [],
       lastActive: new Date().toISOString()
     };
   } catch (error) {
-    console.error('Update stats error:', error);
+    console.error('❌ Update stats error:', error);
+    throw error; // Re-throw for caller to handle
+  }
+}
+
+/**
+ * Increment practice count atomically
+ * Called after each completed practice session
+ */
+export async function incrementPracticeCount(uid) {
+  if (!isFirebaseAvailable()) return null;
+  
+  try {
+    const userRef = doc(db, 'users', uid);
+    
+    await updateDoc(userRef, {
+      'stats.practice_count': increment(1),
+      'stats.lastActive': serverTimestamp()
+    });
+    
+    // Fetch and return new count
+    const userDoc = await getDoc(userRef);
+    const newCount = userDoc.data()?.stats?.practice_count || 0;
+    
+    console.log('✅ Practice count incremented:', newCount);
+    return newCount;
+  } catch (error) {
+    console.error('❌ Increment practice count error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get user progress data
+ * Called on login/session load to restore state
+ */
+export async function getUserProgress(uid) {
+  if (!isFirebaseAvailable()) return null;
+  
+  try {
+    const userRef = doc(db, 'users', uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      console.log('Creating new user progress document');
+      // Initialize new user with default progress
+      const defaultProgress = {
+        practice_count: 0,
+        totalSessions: 0,
+        totalScore: 0,
+        averageScore: 0,
+        highestScore: 0,
+        modulesCompleted: [],
+        lastActive: serverTimestamp()
+      };
+      
+      await updateDoc(userRef, { stats: defaultProgress });
+      return defaultProgress;
+    }
+    
+    const stats = userDoc.data().stats || {};
+    console.log('✅ User progress loaded:', stats);
+    
+    return {
+      practice_count: stats.practice_count || 0,
+      totalSessions: stats.totalSessions || 0,
+      totalScore: stats.totalScore || 0,
+      averageScore: stats.averageScore || 0,
+      highestScore: stats.highestScore || 0,
+      modulesCompleted: stats.modulesCompleted || [],
+      lastActive: stats.lastActive
+    };
+  } catch (error) {
+    console.error('❌ Get user progress error:', error);
+    throw error;
   }
 }
 

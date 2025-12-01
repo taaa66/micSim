@@ -74,11 +74,14 @@ function validateUserProfile(data) {
 
 // Validate user update (only allow stats changes)
 function validateUserUpdate(newData, oldData) {
-  // Only stats and lastActive can change
+  // Core identity fields cannot change
   return newData.uid == oldData.uid
          && newData.idNumber == oldData.idNumber
          && newData.fullName == oldData.fullName
          && newData.specialty == oldData.specialty
          && newData.createdAt == oldData.createdAt
-         && newData.stats is map;
+         && newData.stats is map
+         // Ensure practice_count can only increase (atomic increment)
+         && (newData.stats.practice_count >= oldData.stats.practice_count 
+             || !('practice_count' in oldData.stats));
 }

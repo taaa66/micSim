@@ -18,7 +18,9 @@ import {
   firebaseLogout,
   firebaseUpdateStats,
   firebaseGetLeaderboard,
-  onAuthChange 
+  onAuthChange,
+  getUserProgress,
+  incrementPracticeCount
 } from './firebase.js';
 
 // Storage keys
@@ -84,6 +86,20 @@ export const isLoggedIn = derived(currentUser, $user => !!$user);
 // Auth mode store
 export const authMode = writable(useFirebase ? 'firebase' : 'local');
 
+// Loading state for initial data fetch
+export const isLoading = writable(true);
+
+// User progress store (persistent data from Firebase)
+export const userProgress = writable({
+  practice_count: 0,
+  totalSessions: 0,
+  totalScore: 0,
+  averageScore: 0,
+  highestScore: 0,
+  modulesCompleted: [],
+  lastActive: null
+});
+
 // Subscribe to save current user (local mode only)
 currentUser.subscribe(user => {
   if (!useFirebase) {
@@ -91,11 +107,43 @@ currentUser.subscribe(user => {
   }
 });
 
-// Firebase auth state listener
+// Firebase auth state listener with progress loading
 if (useFirebase) {
-  onAuthChange((user) => {
-    currentUser.set(user);
+  onAuthChange(async (user) => {
+    isLoading.set(true);
+    
+    if (user && user.uid) {
+      try {
+        // Fetch user progress from Firebase
+        const progress = await getUserProgress(user.uid);
+        if (progress) {
+          userProgress.set(progress);
+          // Merge progress into user object
+          user.stats = progress;
+        }
+        currentUser.set(user);
+        console.log('✅ User and progress loaded:', user.fullName, progress);
+      } catch (error) {
+        console.error('❌ Error loading user progress:', error);
+        currentUser.set(user);
+      }
+    } else {
+      currentUser.set(null);
+      userProgress.set({
+        practice_count: 0,
+        totalSessions: 0,
+        totalScore: 0,
+        averageScore: 0,
+        highestScore: 0,
+        modulesCompleted: [],
+        lastActive: null
+      });
+    }
+    
+    isLoading.set(false);
   });
+} else {
+  isLoading.set(false);
 }
 
 // ============================================================================
@@ -244,20 +292,30 @@ export async function logout() {
 
 /**
  * Update user stats after completing a session
+ * Uses atomic increment on Firebase to prevent race conditions
  */
 export async function updateUserStats(score, moduleId) {
   const user = get(currentUser);
-  if (!user) return;
+  if (!user) return null;
 
   if (useFirebase && user.uid) {
-    const newStats = await firebaseUpdateStats(user.uid, score, moduleId);
-    if (newStats) {
-      currentUser.update(u => ({ ...u, stats: newStats }));
+    try {
+      const newStats = await firebaseUpdateStats(user.uid, score, moduleId);
+      if (newStats) {
+        // Update both stores atomically
+        currentUser.update(u => ({ ...u, stats: newStats }));
+        userProgress.set(newStats);
+        console.log('✅ Stats synced to Firebase:', newStats);
+      }
+      return newStats;
+    } catch (error) {
+      console.error('❌ Failed to update stats:', error);
+      return null;
     }
-    return;
   }
 
   // Local mode
+  let updatedStats = null;
   currentUser.update(u => {
     if (!u) return null;
 
@@ -266,10 +324,11 @@ export async function updateUserStats(score, moduleId) {
     stats.totalScore = (stats.totalScore || 0) + score;
     stats.averageScore = Math.round(stats.totalScore / stats.totalSessions);
     stats.highestScore = Math.max(stats.highestScore || 0, score);
+    stats.practice_count = (stats.practice_count || 0) + 1;
     stats.lastActive = new Date().toISOString();
 
-    if (moduleId && !stats.modulesCompleted.includes(moduleId)) {
-      stats.modulesCompleted = [...stats.modulesCompleted, moduleId];
+    if (moduleId && !(stats.modulesCompleted || []).includes(moduleId)) {
+      stats.modulesCompleted = [...(stats.modulesCompleted || []), moduleId];
     }
 
     // Update in DB
@@ -278,8 +337,24 @@ export async function updateUserStats(score, moduleId) {
       saveUsers(usersDB);
     }
 
+    updatedStats = stats;
     return { ...u, stats };
   });
+
+  // Update progress store for local mode
+  if (updatedStats) {
+    userProgress.set(updatedStats);
+  }
+  
+  return updatedStats;
+}
+
+/**
+ * Get current practice count
+ */
+export function getPracticeCount() {
+  const user = get(currentUser);
+  return user?.stats?.practice_count || get(userProgress).practice_count || 0;
 }
 
 // ============================================================================
