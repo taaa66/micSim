@@ -572,17 +572,52 @@
   @media (max-width: 767px) {
     .main-container {
       margin-right: 0;
-      --radius: min(40cqw, 35cqh, 200px);
+      --radius: min(32vw, 28vh, 140px);
     }
     .dashboard {
-      --card-size: min(70px, 18vw);
+      --card-size: min(56px, 14vw);
+    }
+    .card-name {
+      font-size: clamp(5px, 2vw, 7px);
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
+    .card-code {
+      font-size: 5px;
+      padding: 0 2px;
+    }
+    .icon-num {
+      font-size: 9px;
+    }
+    .module-icon {
+      transform: scale(0.7);
+    }
+  }
+  
+  /* Very small phones (iPhone SE, etc) */
+  @media (max-width: 400px) {
+    .main-container {
+      --radius: min(28vw, 24vh, 110px);
+    }
+    .dashboard {
+      --card-size: min(48px, 12vw);
+    }
+    .card-name {
+      font-size: 5px;
     }
   }
 
   /* Small-height tuning (iPad Safari UI visible) */
   @media (max-height: 700px) {
-    .dashboard { --card-size: min(70px, 11vw); }
-    .main-container { --radius: min(30cqw, 32cqh, 200px); }
+    .dashboard { --card-size: min(60px, 11vw); }
+    .main-container { --radius: min(28vw, 28vh, 160px); }
+  }
+  
+  /* iPhone landscape */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .dashboard { --card-size: min(50px, 10vh); }
+    .main-container { --radius: min(20vw, 35vh, 120px); }
+    .header { padding: 4px 8px; }
   }
 
   /* === DATA FLOW - SIMPLE & STABLE === */
