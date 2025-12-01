@@ -1,14 +1,39 @@
 /**
- * Authentication Store
- * Simple auth system using ID (תעודת זהות) and Doctor Number (מספר רופא)
+ * Authentication Store V2.0
+ * =========================
+ * Secure auth system with Firebase support and local fallback
+ * 
+ * Features:
+ * - Firebase Authentication (when configured)
+ * - Secure password hashing for local fallback
+ * - No plain-text passwords stored
+ * - Automatic mode detection
  */
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
+import { hashPassword, verifyPassword, generateSalt } from './crypto.js';
+import { 
+  isFirebaseAvailable, 
+  firebaseRegister, 
+  firebaseLogin, 
+  firebaseLogout,
+  firebaseUpdateStats,
+  firebaseGetLeaderboard,
+  onAuthChange 
+} from './firebase.js';
 
 // Storage keys
-const USERS_KEY = 'ophthalmo_users';
-const CURRENT_USER_KEY = 'ophthalmo_current_user';
+const USERS_KEY = 'ophthalmo_users_v2';
+const CURRENT_USER_KEY = 'ophthalmo_current_user_v2';
+const AUTH_MODE_KEY = 'ophthalmo_auth_mode';
 
-// Load users from localStorage
+// Determine auth mode
+const useFirebase = isFirebaseAvailable();
+console.log(`🔐 Auth mode: ${useFirebase ? 'Firebase' : 'Local (secure)'}`);
+
+// ============================================================================
+// LOCAL STORAGE FUNCTIONS (Secure with hashing)
+// ============================================================================
+
 function loadUsers() {
   try {
     const data = localStorage.getItem(USERS_KEY);
@@ -18,12 +43,10 @@ function loadUsers() {
   }
 }
 
-// Save users to localStorage
 function saveUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-// Load current user from localStorage
 function loadCurrentUser() {
   try {
     const data = localStorage.getItem(CURRENT_USER_KEY);
@@ -33,8 +56,24 @@ function loadCurrentUser() {
   }
 }
 
+function saveCurrentUser(user) {
+  if (user) {
+    // Never save password hash to current user session
+    const safeUser = { ...user };
+    delete safeUser.passwordHash;
+    delete safeUser.salt;
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser));
+  } else {
+    localStorage.removeItem(CURRENT_USER_KEY);
+  }
+}
+
 // Users database (in-memory + localStorage)
 let usersDB = loadUsers();
+
+// ============================================================================
+// STORES
+// ============================================================================
 
 // Current user store
 export const currentUser = writable(loadCurrentUser());
@@ -42,37 +81,44 @@ export const currentUser = writable(loadCurrentUser());
 // Is logged in derived store
 export const isLoggedIn = derived(currentUser, $user => !!$user);
 
-// Subscribe to save current user
+// Auth mode store
+export const authMode = writable(useFirebase ? 'firebase' : 'local');
+
+// Subscribe to save current user (local mode only)
 currentUser.subscribe(user => {
-  if (user) {
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(CURRENT_USER_KEY);
+  if (!useFirebase) {
+    saveCurrentUser(user);
   }
 });
 
+// Firebase auth state listener
+if (useFirebase) {
+  onAuthChange((user) => {
+    currentUser.set(user);
+  });
+}
+
+// ============================================================================
+// REGISTRATION
+// ============================================================================
+
 /**
  * Register a new user
- * @param {string} idNumber - תעודת זהות (9 digits)
- * @param {string} doctorNumber - מספר רופא (password)
+ * @param {string} idNumber - תעודת זהות (5-9 digits)
+ * @param {string} doctorNumber - מספר רופא (password, min 6 chars)
  * @param {string} fullName - שם מלא
  * @param {string} specialty - התמחות (optional)
  */
-export function register(idNumber, doctorNumber, fullName, specialty = '') {
-  // Validate ID number (9 digits)
+export async function register(idNumber, doctorNumber, fullName, specialty = '') {
+  // Validate ID number
   const cleanId = idNumber.replace(/\D/g, '');
   if (cleanId.length < 5 || cleanId.length > 9) {
     return { success: false, error: 'תעודת זהות חייבת להכיל 5-9 ספרות' };
   }
 
-  // Check if user exists
-  if (usersDB[cleanId]) {
-    return { success: false, error: 'משתמש קיים במערכת' };
-  }
-
-  // Validate doctor number
-  if (!doctorNumber || doctorNumber.length < 4) {
-    return { success: false, error: 'מספר רופא חייב להכיל לפחות 4 תווים' };
+  // Validate doctor number (Firebase requires min 6 chars)
+  if (!doctorNumber || doctorNumber.length < 6) {
+    return { success: false, error: 'מספר רופא חייב להכיל לפחות 6 תווים' };
   }
 
   // Validate name
@@ -80,10 +126,25 @@ export function register(idNumber, doctorNumber, fullName, specialty = '') {
     return { success: false, error: 'נא להזין שם מלא' };
   }
 
-  // Create user
+  // Use Firebase if available
+  if (useFirebase) {
+    return await firebaseRegister(cleanId, doctorNumber, fullName.trim(), specialty.trim());
+  }
+
+  // Local mode with secure hashing
+  if (usersDB[cleanId]) {
+    return { success: false, error: 'משתמש קיים במערכת' };
+  }
+
+  // Generate salt and hash password
+  const salt = generateSalt();
+  const passwordHash = await hashPassword(doctorNumber, salt);
+
+  // Create user (NO plain-text password stored)
   const user = {
     id: cleanId,
-    doctorNumber: doctorNumber,
+    salt: salt,
+    passwordHash: passwordHash,
     fullName: fullName.trim(),
     specialty: specialty.trim() || 'רופא עיניים',
     createdAt: new Date().toISOString(),
@@ -93,7 +154,7 @@ export function register(idNumber, doctorNumber, fullName, specialty = '') {
       averageScore: 0,
       highestScore: 0,
       modulesCompleted: [],
-      lastActive: null
+      lastActive: new Date().toISOString()
     }
   };
 
@@ -101,28 +162,47 @@ export function register(idNumber, doctorNumber, fullName, specialty = '') {
   usersDB[cleanId] = user;
   saveUsers(usersDB);
 
-  // Auto login
-  currentUser.set(user);
+  // Create safe user object for session (without credentials)
+  const safeUser = {
+    id: user.id,
+    fullName: user.fullName,
+    specialty: user.specialty,
+    createdAt: user.createdAt,
+    stats: user.stats
+  };
 
-  return { success: true, user };
+  // Auto login
+  currentUser.set(safeUser);
+
+  return { success: true, user: safeUser };
 }
+
+// ============================================================================
+// LOGIN
+// ============================================================================
 
 /**
  * Login user
  * @param {string} idNumber - תעודת זהות
  * @param {string} doctorNumber - מספר רופא
  */
-export function login(idNumber, doctorNumber) {
+export async function login(idNumber, doctorNumber) {
   const cleanId = idNumber.replace(/\D/g, '');
 
-  // Find user
+  // Use Firebase if available
+  if (useFirebase) {
+    return await firebaseLogin(cleanId, doctorNumber);
+  }
+
+  // Local mode with secure verification
   const user = usersDB[cleanId];
   if (!user) {
     return { success: false, error: 'משתמש לא נמצא' };
   }
 
-  // Check password
-  if (user.doctorNumber !== doctorNumber) {
+  // Verify password hash
+  const isValid = await verifyPassword(doctorNumber, user.salt, user.passwordHash);
+  if (!isValid) {
     return { success: false, error: 'מספר רופא שגוי' };
   }
 
@@ -131,65 +211,111 @@ export function login(idNumber, doctorNumber) {
   usersDB[cleanId] = user;
   saveUsers(usersDB);
 
-  // Set current user
-  currentUser.set(user);
+  // Create safe user object for session
+  const safeUser = {
+    id: user.id,
+    fullName: user.fullName,
+    specialty: user.specialty,
+    createdAt: user.createdAt,
+    stats: user.stats
+  };
 
-  return { success: true, user };
+  currentUser.set(safeUser);
+  return { success: true, user: safeUser };
 }
+
+// ============================================================================
+// LOGOUT
+// ============================================================================
 
 /**
  * Logout current user
  */
-export function logout() {
+export async function logout() {
+  if (useFirebase) {
+    await firebaseLogout();
+  }
   currentUser.set(null);
 }
+
+// ============================================================================
+// STATS UPDATE
+// ============================================================================
 
 /**
  * Update user stats after completing a session
  */
-export function updateUserStats(score, moduleId) {
-  currentUser.update(user => {
-    if (!user) return null;
+export async function updateUserStats(score, moduleId) {
+  const user = get(currentUser);
+  if (!user) return;
 
-    user.stats.totalSessions += 1;
-    user.stats.totalScore += score;
-    user.stats.averageScore = Math.round(user.stats.totalScore / user.stats.totalSessions);
-    user.stats.highestScore = Math.max(user.stats.highestScore, score);
-    user.stats.lastActive = new Date().toISOString();
+  if (useFirebase && user.uid) {
+    const newStats = await firebaseUpdateStats(user.uid, score, moduleId);
+    if (newStats) {
+      currentUser.update(u => ({ ...u, stats: newStats }));
+    }
+    return;
+  }
 
-    if (moduleId && !user.stats.modulesCompleted.includes(moduleId)) {
-      user.stats.modulesCompleted.push(moduleId);
+  // Local mode
+  currentUser.update(u => {
+    if (!u) return null;
+
+    const stats = { ...u.stats };
+    stats.totalSessions = (stats.totalSessions || 0) + 1;
+    stats.totalScore = (stats.totalScore || 0) + score;
+    stats.averageScore = Math.round(stats.totalScore / stats.totalSessions);
+    stats.highestScore = Math.max(stats.highestScore || 0, score);
+    stats.lastActive = new Date().toISOString();
+
+    if (moduleId && !stats.modulesCompleted.includes(moduleId)) {
+      stats.modulesCompleted = [...stats.modulesCompleted, moduleId];
     }
 
-    // Save to DB
-    usersDB[user.id] = user;
-    saveUsers(usersDB);
+    // Update in DB
+    if (usersDB[u.id]) {
+      usersDB[u.id].stats = stats;
+      saveUsers(usersDB);
+    }
 
-    return user;
+    return { ...u, stats };
   });
 }
+
+// ============================================================================
+// LEADERBOARD
+// ============================================================================
 
 /**
  * Get all users for leaderboard (sorted by highest score)
  */
-export function getLeaderboard() {
+export async function getLeaderboard() {
+  if (useFirebase) {
+    return await firebaseGetLeaderboard();
+  }
+
+  // Local mode
   return Object.values(usersDB)
     .map(u => ({
       id: u.id,
       fullName: u.fullName,
       specialty: u.specialty,
-      highestScore: u.stats.highestScore,
-      averageScore: u.stats.averageScore,
-      totalSessions: u.stats.totalSessions,
-      modulesCompleted: u.stats.modulesCompleted.length
+      highestScore: u.stats?.highestScore || 0,
+      averageScore: u.stats?.averageScore || 0,
+      totalSessions: u.stats?.totalSessions || 0,
+      modulesCompleted: u.stats?.modulesCompleted?.length || 0
     }))
     .sort((a, b) => b.highestScore - a.highestScore);
 }
+
+// ============================================================================
+// DERIVED STORES
+// ============================================================================
 
 /**
  * Get display name for current user
  */
 export const displayName = derived(currentUser, $user => {
   if (!$user) return 'אורח';
-  return $user.fullName || `Dr. ${$user.id.slice(-4)}`;
+  return $user.fullName || `Dr. ${$user.id?.slice(-4) || '????'}`;
 });

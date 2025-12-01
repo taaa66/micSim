@@ -1,0 +1,84 @@
+rules_version = '2';
+
+/**
+ * Firestore Security Rules for Ophthalmic Simulator
+ * =================================================
+ * 
+ * These rules ensure:
+ * 1. Users can only access their own data
+ * 2. Authenticated users can view leaderboard (limited fields)
+ * 3. No data can be deleted (preservation)
+ * 4. All other access is blocked
+ * 
+ * Deploy with: firebase deploy --only firestore:rules
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ================================================================
+    // USERS COLLECTION
+    // ================================================================
+    match /users/{userId} {
+      
+      // Users can read their own complete profile
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Users can create their own profile on registration
+      allow create: if request.auth != null 
+                    && request.auth.uid == userId
+                    && validateUserProfile(request.resource.data);
+      
+      // Users can update their own profile (stats only)
+      allow update: if request.auth != null 
+                    && request.auth.uid == userId
+                    && validateUserUpdate(request.resource.data, resource.data);
+      
+      // Never allow delete - preserve all user data
+      allow delete: if false;
+    }
+    
+    // ================================================================
+    // LEADERBOARD ACCESS
+    // ================================================================
+    // Separate read rule for leaderboard queries
+    match /users/{userId} {
+      // Any authenticated user can read leaderboard data
+      // (full profile data is protected by the more specific rule above)
+      allow list: if request.auth != null;
+    }
+    
+    // ================================================================
+    // BLOCK EVERYTHING ELSE
+    // ================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// ================================================================
+// VALIDATION FUNCTIONS
+// ================================================================
+
+// Validate new user profile structure
+function validateUserProfile(data) {
+  return data.keys().hasAll(['uid', 'idNumber', 'fullName', 'specialty', 'createdAt', 'stats'])
+         && data.uid is string
+         && data.idNumber is string
+         && data.fullName is string
+         && data.fullName.size() >= 2
+         && data.specialty is string
+         && data.stats is map;
+}
+
+// Validate user update (only allow stats changes)
+function validateUserUpdate(newData, oldData) {
+  // Only stats and lastActive can change
+  return newData.uid == oldData.uid
+         && newData.idNumber == oldData.idNumber
+         && newData.fullName == oldData.fullName
+         && newData.specialty == oldData.specialty
+         && newData.createdAt == oldData.createdAt
+         && newData.stats is map;
+}

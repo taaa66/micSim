@@ -23,3 +23,21 @@ dist-node
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables (NEVER commit these)
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Secrets and credentials
+*.pem
+*.key
+serviceAccountKey.json
+*-credentials.json

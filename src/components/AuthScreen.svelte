@@ -15,9 +15,9 @@
   let fullName = '';
   let specialty = '';
 
-  // Validation
+  // Validation (min 6 chars for password - Firebase requirement)
   $: idValid = idNumber.replace(/\D/g, '').length >= 5;
-  $: doctorValid = doctorNumber.length >= 4;
+  $: doctorValid = doctorNumber.length >= 6;
   $: nameValid = fullName.trim().length >= 2;
   $: canSubmit = mode === 'login' 
     ? (idValid && doctorValid)
@@ -29,22 +29,25 @@
     isLoading = true;
     error = '';
 
-    // Simulate network delay for UX
-    await new Promise(r => setTimeout(r, 500));
+    try {
+      let result;
+      if (mode === 'login') {
+        result = await login(idNumber, doctorNumber);
+      } else {
+        result = await register(idNumber, doctorNumber, fullName, specialty);
+      }
 
-    let result;
-    if (mode === 'login') {
-      result = login(idNumber, doctorNumber);
-    } else {
-      result = register(idNumber, doctorNumber, fullName, specialty);
-    }
+      isLoading = false;
 
-    isLoading = false;
-
-    if (result.success) {
-      dispatch('authenticated', result.user);
-    } else {
-      error = result.error;
+      if (result.success) {
+        dispatch('authenticated', result.user);
+      } else {
+        error = result.error;
+      }
+    } catch (err) {
+      isLoading = false;
+      error = 'שגיאה בהתחברות. נסה שוב.';
+      console.error('Auth error:', err);
     }
   }
 
@@ -124,7 +127,7 @@
           class:valid={doctorValid}
           autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
         />
-        <span class="hint">משמש כסיסמה</span>
+        <span class="hint">משמש כסיסמה (לפחות 6 תווים)</span>
       </div>
 
       {#if mode === 'register'}

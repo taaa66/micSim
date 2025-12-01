@@ -155,6 +155,9 @@
     position: fixed;
     inset: 0;
     z-index: 999;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
+    cursor: pointer;
   }
 
   .user-panel {
