@@ -4,6 +4,7 @@
   import { audio } from '../lib/audio.js';
   import TorqueGauge from './TorqueGauge.svelte';
   import OrganicBackground from './OrganicBackground.svelte';
+  import ModuleIcons from './ModuleIcons.svelte';
   import { fade, fly, scale } from 'svelte/transition';
   import { cubicOut, elasticOut } from 'svelte/easing';
 
@@ -216,25 +217,25 @@
   <div class="main-container" class:dim={!!selectedModule}>
     <!-- V12 Ambient AO overlay -->
     <div class="ambient-ao" class:warning={systemStatus==='WARNING'} aria-hidden="true"></div>
-    <!-- Data Flow Lines - SIMPLE & STABLE -->
+    <!-- Technical Data Flow Lines -->
     <svg class="data-flow" viewBox="-50 -50 100 100">
       <defs>
         <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="rgba(52,211,153,0)" />
-          <stop offset="50%" stop-color="rgba(52,211,153,0.4)" />
-          <stop offset="100%" stop-color="rgba(52,211,153,0)" />
+          <stop offset="0%" stop-color="rgba(0,255,255,0)" />
+          <stop offset="50%" stop-color="rgba(0,255,255,0.5)" />
+          <stop offset="100%" stop-color="rgba(0,255,255,0)" />
         </linearGradient>
       </defs>
       {#each allModules as _, i}
         {@const a = -90 + i * 360 / allModules.length}
         {@const r = a * Math.PI / 180}
         <line class="flow-line" x1="0" y1="0" x2={38 * Math.cos(r)} y2={38 * Math.sin(r)} 
-          stroke="rgba(52,211,153,0.15)" stroke-width="0.3"/>
+          stroke="rgba(0,255,255,0.2)" stroke-width="0.4"/>
         <line class="flow-pulse" x1="0" y1="0" x2={38 * Math.cos(r)} y2={38 * Math.sin(r)} 
-          stroke="url(#flowGrad)" stroke-width="0.5" style="--delay: {i * 0.15}s"/>
+          stroke="url(#flowGrad)" stroke-width="0.6" style="--delay: {i * 0.15}s"/>
       {/each}
-      <circle cx="0" cy="0" r="12" stroke="rgba(52,211,153,0.2)" stroke-width="0.2" fill="none" class="orbit-ring"/>
-      <circle cx="0" cy="0" r="25" stroke="rgba(52,211,153,0.1)" stroke-width="0.2" fill="none" class="orbit-ring"/>
+      <circle cx="0" cy="0" r="12" stroke="rgba(0,255,255,0.25)" stroke-width="0.3" fill="none" class="orbit-ring"/>
+      <circle cx="0" cy="0" r="25" stroke="rgba(0,255,255,0.15)" stroke-width="0.2" fill="none" class="orbit-ring"/>
     </svg>
 
     <!-- Central Eye with projection animation -->
@@ -274,12 +275,18 @@
         >
           <!-- Progress Ring with animated fill -->
           <svg class="prog-ring" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-            <circle class="prog-fill" class:no-anim={!supportsStrokeAnim} cx="20" cy="20" r="17" fill="none" stroke="#34d399" stroke-width="2.5"
+            <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(0,255,255,0.15)" stroke-width="2"/>
+            <circle class="prog-fill" class:no-anim={!supportsStrokeAnim} cx="20" cy="20" r="17" fill="none" stroke="var(--cyan-400)" stroke-width="2.5"
               stroke-dasharray="107" stroke-dashoffset="var(--offset)"
               stroke-linecap="round" transform="rotate(-90 20 20)"
               style="--offset: {107 - (107 * m.mastery / 100)}"/>
           </svg>
+          
+          <!-- Module Icon -->
+          <div class="module-icon">
+            <ModuleIcons moduleId={m.id} size={20} color="var(--cyan-400)" />
+          </div>
+          
           <span class="icon-num">{m.num}</span>
 
           <!-- Content -->
@@ -577,12 +584,12 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle, #0d2b35 0%, #051014 100%);
-    border: 2px solid rgba(52,211,153,0.3);
+    background: radial-gradient(circle, var(--bg-elevated) 0%, var(--bg-space) 100%);
+    border: 2px solid var(--cyan-400);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 40px rgba(52,211,153,0.15);
+    box-shadow: 0 0 40px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1);
     position: relative;
     animation: eyePulse 3s ease-in-out infinite;
   }
@@ -600,13 +607,13 @@
     100% { opacity: 0; transform: scale(1.3); }
   }
   @keyframes eyePulse {
-    0%, 100% { box-shadow: 0 0 40px rgba(52,211,153,0.15); }
-    50% { box-shadow: 0 0 60px rgba(52,211,153,0.25); }
+    0%, 100% { box-shadow: 0 0 40px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); }
+    50% { box-shadow: 0 0 60px rgba(0,255,255,0.5), inset 0 0 30px rgba(0,255,255,0.15); }
   }
   .eye-glow {
     position: absolute;
     inset: -20px;
-    background: radial-gradient(circle, rgba(52,211,153,0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0,255,255,0.2) 0%, transparent 70%);
     border-radius: 50%;
     animation: glowPulse 2s ease-in-out infinite;
   }
@@ -618,10 +625,11 @@
     width: 55%;
     height: 55%;
     border-radius: 50%;
-    background: radial-gradient(circle, #1a5a6a 0%, #0f3a45 100%);
+    background: radial-gradient(circle, var(--cyan-800) 0%, var(--cyan-900) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: inset 0 0 15px rgba(0,255,255,0.3);
   }
   .pupil {
     width: 50%;
@@ -737,19 +745,44 @@
     from { stroke-dashoffset: 107; }
     to { stroke-dashoffset: var(--offset); }
   }
+  /* Module Icon */
+  .module-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  
+  .module-card:hover .module-icon {
+    opacity: 1;
+  }
+  
   .icon-num {
-    font-size: clamp(12px, 3vw, 16px);
-    font-weight: 800;
-    color: var(--text);
-    z-index: 1;
+    position: absolute;
+    top: 8%;
+    right: 12%;
+    font-size: clamp(10px, 2.5vw, 14px);
+    font-weight: 700;
+    color: var(--cyan-400);
+    font-family: var(--font-display);
+    z-index: 3;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
   }
 
   .card-content {
+    position: absolute;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1px;
     z-index: 1;
+    width: 90%;
   }
   .card-name {
     font-size: clamp(5px, 1.2vw, 7px);
