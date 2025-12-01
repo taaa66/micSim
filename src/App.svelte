@@ -24,6 +24,10 @@
   import UserPanel from './components/UserPanel.svelte';
   import { isLoggedIn, currentUser, displayName, updateUserStats } from './lib/authStore.js';
 
+  // Analytics
+  import AnalyticsDashboard from './components/analytics/AnalyticsDashboard.svelte';
+  import { recordSession } from './lib/analyticsStore.js';
+
   let currentView = 'dashboard';
   let userPanelOpen = false;
   let selectedSim = null;
@@ -96,20 +100,41 @@
     selectedGame = null;
   }
 
-  function handleComplete(score) {
-    console.log('Simulation complete:', score);
+  function handleComplete(result) {
+    console.log('Simulation complete:', result);
+    const score = result?.score || result || 0;
+    const duration = result?.duration || 60;
+    
     // Update user stats
     if (selectedSim) {
-      updateUserStats(score?.score || score || 0, selectedSim.id);
+      updateUserStats(score, selectedSim.id);
+      // Record in analytics
+      recordSession(selectedSim.id, score, duration, {
+        accuracy: result?.accuracy,
+        speed: result?.speed,
+        consistency: result?.consistency
+      });
     }
   }
 
-  function handleGameComplete(score) {
-    console.log('Game complete:', score);
+  function handleGameComplete(result) {
+    console.log('Game complete:', result);
+    const score = result?.score || result || 0;
+    const duration = result?.duration || 60;
+    
     // Update user stats for games
     if (selectedGame) {
-      updateUserStats(score?.score || score || 0, `game-${selectedGame.id}`);
+      updateUserStats(score, `game-${selectedGame.id}`);
+      // Record in analytics
+      recordSession(`game-${selectedGame.id}`, score, duration, {
+        accuracy: result?.accuracy,
+        speed: result?.speed
+      });
     }
+  }
+
+  function handleOpenAnalytics() {
+    currentView = 'analytics';
   }
 
   function handleAuthenticated(e) {
@@ -122,7 +147,7 @@
   <AuthScreen on:authenticated={handleAuthenticated} />
 {:else}
   <!-- User Panel (always visible when logged in) -->
-  <UserPanel bind:isOpen={userPanelOpen} />
+  <UserPanel bind:isOpen={userPanelOpen} on:openAnalytics={handleOpenAnalytics} />
   
   <div class="app">
     {#if currentView === 'dashboard'}
@@ -158,6 +183,8 @@
       onComplete={handleComplete}
       onBack={handleBackToDashboard}
     />
+  {:else if currentView === 'analytics'}
+    <AnalyticsDashboard onBack={handleBackToDashboard} />
   {/if}
   </div>
 {/if}

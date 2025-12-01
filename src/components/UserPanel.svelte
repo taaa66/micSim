@@ -1,6 +1,9 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { currentUser, logout, displayName } from '../lib/authStore.js';
+  
+  const dispatch = createEventDispatcher();
   
   export let isOpen = false;
   
@@ -8,6 +11,11 @@
     if (confirm('האם אתה בטוח שברצונך להתנתק?')) {
       logout();
     }
+  }
+  
+  function handleOpenAnalytics() {
+    isOpen = false;
+    dispatch('openAnalytics');
   }
 
   function togglePanel() {
@@ -83,6 +91,12 @@
 
     <!-- Actions -->
     <div class="actions">
+      <button class="analytics-btn" on:click={handleOpenAnalytics}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 20V10M12 20V4M6 20v-6"/>
+        </svg>
+        סטטיסטיקות
+      </button>
       <button class="logout-btn" on:click={handleLogout}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -261,7 +275,36 @@
 
   .actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
+  }
+
+  .analytics-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(15, 184, 159, 0.2), rgba(52, 211, 153, 0.1));
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    border-radius: 10px;
+    color: #34d399;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .analytics-btn:hover {
+    background: linear-gradient(135deg, rgba(15, 184, 159, 0.3), rgba(52, 211, 153, 0.2));
+    border-color: rgba(52, 211, 153, 0.6);
+    transform: translateY(-1px);
+  }
+
+  .analytics-btn svg {
+    width: 18px;
+    height: 18px;
   }
 
   .logout-btn {
