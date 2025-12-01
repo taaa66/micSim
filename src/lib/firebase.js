@@ -38,15 +38,15 @@ import {
   getDocs
 } from 'firebase/firestore';
 
-// Firebase configuration
-// REPLACE THESE VALUES with your Firebase project config
+// Firebase configuration - MicroSim Project
 const firebaseConfig = {
-  apiKey: "AIzaSyD_PLACEHOLDER_REPLACE_ME",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: "AIzaSyCjayCaQybHMevNzUNjdNv5Q54DPFa95e8",
+  authDomain: "microsim-c670b.firebaseapp.com",
+  projectId: "microsim-c670b",
+  storageBucket: "microsim-c670b.firebasestorage.app",
+  messagingSenderId: "622906420676",
+  appId: "1:622906420676:web:47bfe822eabfb8338f8891",
+  measurementId: "G-Z55HG8CPRL"
 };
 
 // Check if Firebase is configured
