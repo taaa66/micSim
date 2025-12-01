@@ -19,6 +19,10 @@
   import VectorRace from './components/games/VectorRace.svelte';
   import NanoGripGauntlet from './components/games/NanoGripGauntlet.svelte';
 
+  // Authentication
+  import AuthScreen from './components/AuthScreen.svelte';
+  import { isLoggedIn, currentUser, displayName, updateUserStats } from './lib/authStore.js';
+
   let currentView = 'dashboard';
   let selectedSim = null;
   let selectedGame = null;
@@ -92,33 +96,47 @@
 
   function handleComplete(score) {
     console.log('Simulation complete:', score);
+    // Update user stats
+    if (selectedSim) {
+      updateUserStats(score?.score || score || 0, selectedSim.id);
+    }
   }
 
   function handleGameComplete(score) {
     console.log('Game complete:', score);
-    // TODO: Update Apex Motor Control Rankings
-    // TODO: Trigger skill transfer visualization
+    // Update user stats for games
+    if (selectedGame) {
+      updateUserStats(score?.score || score || 0, `game-${selectedGame.id}`);
+    }
+  }
+
+  function handleAuthenticated(e) {
+    console.log('User authenticated:', e.detail?.fullName || e.detail);
   }
 </script>
 
-<div class="app">
-  {#if currentView === 'dashboard'}
-    <RadialDashboard 
-      on:select={handleSelect} 
-      on:moduleHover={handleModuleHover}
-      on:coreGames={handleCoreGames}
-    />
-    
-    <!-- Apex Panel -->
-    <div class="apex-desktop">
-      <ApexLeaguePanel 
-        bind:isOpen={apexPanelOpen}
-        currentUser="Dr. J. Smith"
-        {activeModule}
-        on:allocate={handleApexAllocate}
+<!-- Auth Screen - shown when not logged in -->
+{#if !$isLoggedIn}
+  <AuthScreen on:authenticated={handleAuthenticated} />
+{:else}
+  <div class="app">
+    {#if currentView === 'dashboard'}
+      <RadialDashboard 
+        on:select={handleSelect} 
+        on:moduleHover={handleModuleHover}
+        on:coreGames={handleCoreGames}
       />
-    </div>
-  {:else if currentView === 'core-games'}
+      
+      <!-- Apex Panel -->
+      <div class="apex-desktop">
+        <ApexLeaguePanel 
+          bind:isOpen={apexPanelOpen}
+          currentUser={$displayName}
+          {activeModule}
+          on:allocate={handleApexAllocate}
+        />
+      </div>
+    {:else if currentView === 'core-games'}
     <CoreGamesHub 
       onBack={handleBackToDashboard}
       onSelectGame={handleSelectGame}
@@ -136,7 +154,8 @@
       onBack={handleBackToDashboard}
     />
   {/if}
-</div>
+  </div>
+{/if}
 
 <style>
   /* App container - full viewport */
