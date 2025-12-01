@@ -5,6 +5,7 @@
   import TorqueGauge from './TorqueGauge.svelte';
   import OrganicBackground from './OrganicBackground.svelte';
   import ModuleIcons from './ModuleIcons.svelte';
+  import UIIcons from './UIIcons.svelte';
   import { fade, fly, scale } from 'svelte/transition';
   import { cubicOut, elasticOut } from 'svelte/easing';
 
@@ -193,9 +194,21 @@
   
   <!-- Header -->
   <header class="header" class:visible={bootPhase >= 1}>
+    <div class="header-left">
+      <UIIcons icon="eye" size={24} color="var(--cyan-400)" />
+    </div>
     <div class="header-center">
-      <h1 class="scanline-text">OPHTHALMIC SURGICAL SIMULATOR</h1>
-      <p>INTELLIGENT SURGICAL DASHBOARD • V7.0</p>
+      <h1 class="scanline-text">
+        <UIIcons icon="target" size={16} color="var(--cyan-400)" />
+        OPHTHALMIC SURGICAL SIMULATOR
+      </h1>
+      <p>
+        <UIIcons icon="activity" size={12} color="var(--cyan-400)" />
+        INTELLIGENT SURGICAL DASHBOARD • V7.0
+      </p>
+    </div>
+    <div class="header-right">
+      <UIIcons icon="user" size={20} color="var(--cyan-400)" />
     </div>
 
   {#if traceActive}
@@ -455,13 +468,41 @@
     opacity: 1;
     transform: translateY(0);
   }
-  .header-center { text-align: center; }
+  
+  .header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  
+  .header-left:hover, .header-right:hover {
+    opacity: 1;
+  }
+  
+  .header-center { 
+    text-align: center;
+    flex: 1;
+  }
+  
   .header h1 {
     font-family: var(--font-display);
     font-size: clamp(10px, 2.5vw, 16px);
     font-weight: var(--font-bold);
     letter-spacing: var(--tracking-wide);
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+  
+  .header p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
   }
   .scanline-text {
     animation: scanline 0.8s var(--ease-out) forwards;
