@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <radialGradient id="redReflexGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6a3030"/>
+      <stop offset="30%" stop-color="#4a2020"/>
+      <stop offset="60%" stop-color="#2a1515"/>
+      <stop offset="100%" stop-color="#100808"/>
+    </radialGradient>
+    
+    <radialGradient id="pupilGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8a4040"/>
+      <stop offset="50%" stop-color="#5a2525"/>
+      <stop offset="100%" stop-color="#3a1818"/>
+    </radialGradient>
+    
+    <filter id="floaterBlur">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+    
+    <filter id="retinalTexture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3"/>
+      <feDiffuseLighting lighting-color="#6a3535" surfaceScale="0.5">
+        <feDistantLight azimuth="45" elevation="60"/>
+      </feDiffuseLighting>
+    </filter>
+  </defs>
+  
+  <!-- Background - dark examination room -->
+  <rect width="100%" height="100%" fill="#080404"/>
+  
+  <!-- Red reflex through dilated pupil -->
+  <circle cx="800" cy="500" r="350" fill="url(#redReflexGradient)"/>
+  
+  <!-- Retinal vessel simulation -->
+  <g opacity="0.15">
+    <path d="M 800,500 Q 650,450 550,380" fill="none" stroke="#5a2020" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 550,380 Q 480,340 400,320" fill="none" stroke="#4a1818" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 550,380 Q 500,400 450,450" fill="none" stroke="#4a1818" stroke-width="4" stroke-linecap="round"/>
+    
+    <path d="M 800,500 Q 950,450 1050,380" fill="none" stroke="#5a2020" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 1050,380 Q 1120,340 1200,320" fill="none" stroke="#4a1818" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 1050,380 Q 1100,400 1150,450" fill="none" stroke="#4a1818" stroke-width="4" stroke-linecap="round"/>
+    
+    <path d="M 800,500 Q 700,600 600,700" fill="none" stroke="#5a2020" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 800,500 Q 900,600 1000,700" fill="none" stroke="#5a2020" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Optic disc (fovea region) -->
+  <circle cx="800" cy="500" r="40" fill="url(#pupilGlow)"/>
+  <circle cx="800" cy="500" r="25" fill="rgba(120,60,60,0.6)"/>
+  
+  <!-- Simulated floaters -->
+  <g filter="url(#floaterBlur)" opacity="0.3">
+    <ellipse cx="600" cy="400" rx="30" ry="15" fill="#1a0a0a" transform="rotate(20 600 400)"/>
+    <circle cx="950" cy="350" r="12" fill="#150808"/>
+    <ellipse cx="700" cy="600" rx="25" ry="10" fill="#180a0a" transform="rotate(-15 700 600)"/>
+    <path d="M 500,500 Q 520,480 540,510 Q 560,540 550,560" fill="none" stroke="#120606" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Light reflection from ophthalmoscope -->
+  <ellipse cx="650" cy="380" rx="30" ry="15" fill="rgba(255,200,180,0.1)" transform="rotate(-30 650 380)"/>
+  <circle cx="660" cy="370" r="8" fill="rgba(255,220,200,0.2)"/>
+  
+  <!-- Pupil border (iris edge) -->
+  <circle cx="800" cy="500" r="350" fill="none" stroke="rgba(40,25,25,0.8)" stroke-width="30"/>
+  <circle cx="800" cy="500" r="365" fill="none" stroke="rgba(20,12,12,0.9)" stroke-width="15"/>
+</svg>

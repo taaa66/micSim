@@ -1,0 +1,37 @@
+{
+  "name": "ophthalmo-sim",
+  "private": true,
+  "version": "14.0.0",
+  "type": "module",
+  "description": "Ophthalmic Surgical Simulator - Enterprise-grade training application",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "build:qa": "vite build --mode qa",
+    "build:prod": "vite build --mode production --config config/build/vite.config.prod.js",
+    "preview": "vite preview --host",
+    "test": "vitest",
+    "test:unit": "vitest run --dir test/unit",
+    "test:e2e": "playwright test --config test/e2e",
+    "test:perf": "playwright test --config test/performance",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .js,.ts,.svelte",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "autoprefixer": "^10.4.16",
+    "svelte": "^5.43.8",
+    "svelte-check": "^3.6.0",
+    "terser": "^5.24.0",
+    "typescript": "^5.3.0",
+    "vite": "^7.2.4",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

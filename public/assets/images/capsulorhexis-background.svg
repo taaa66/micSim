@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <!-- Microscope lens vignette -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2a4a55"/>
+      <stop offset="40%" stop-color="#1e3a42"/>
+      <stop offset="70%" stop-color="#152a30"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    
+    <!-- Lens capsule texture -->
+    <filter id="capsuleTexture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise"/>
+      <feDiffuseLighting in="noise" lighting-color="#3a6a75" surfaceScale="2" result="diffuse">
+        <feDistantLight azimuth="45" elevation="60"/>
+      </feDiffuseLighting>
+      <feComposite in="SourceGraphic" in2="diffuse" operator="arithmetic" k1="0.5" k2="0.5" k3="0" k4="0"/>
+    </filter>
+    
+    <!-- Subtle circular rings for lens -->
+    <pattern id="lensRings" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(100,180,200,0.03)" stroke-width="0.5"/>
+      <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(100,180,200,0.02)" stroke-width="0.3"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#vignette)"/>
+  
+  <!-- Microscope field of view circle -->
+  <circle cx="800" cy="500" r="420" fill="rgba(25,45,50,0.8)"/>
+  
+  <!-- Iris representation -->
+  <circle cx="800" cy="500" r="380" fill="none" stroke="rgba(60,100,120,0.15)" stroke-width="40"/>
+  <circle cx="800" cy="500" r="340" fill="none" stroke="rgba(50,90,110,0.1)" stroke-width="30"/>
+  
+  <!-- Pupil/lens area -->
+  <circle cx="800" cy="500" r="280" fill="rgba(20,35,40,0.9)"/>
+  
+  <!-- Lens capsule surface with texture hint -->
+  <circle cx="800" cy="500" r="260" fill="rgba(35,60,70,0.6)" filter="url(#capsuleTexture)"/>
+  
+  <!-- Light reflections -->
+  <ellipse cx="700" cy="420" rx="60" ry="30" fill="rgba(255,255,255,0.08)" transform="rotate(-20 700 420)"/>
+  <ellipse cx="720" cy="400" rx="25" ry="12" fill="rgba(255,255,255,0.15)" transform="rotate(-15 720 400)"/>
+  
+  <!-- Subtle capsule membrane hint -->
+  <circle cx="800" cy="500" r="200" fill="none" stroke="rgba(80,140,160,0.12)" stroke-width="2"/>
+  
+  <!-- Target zone indicator (ghost) -->
+  <circle cx="800" cy="500" r="150" fill="none" stroke="rgba(15,184,159,0.08)" stroke-width="25" stroke-dasharray="15,10"/>
+</svg>

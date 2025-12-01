@@ -1,0 +1,30 @@
+{
+  "environment": "development",
+  "debug": true,
+  "api": {
+    "baseUrl": "http://localhost:3000/api",
+    "wsUrl": "ws://localhost:3000/ws",
+    "timeout": 30000
+  },
+  "features": {
+    "zeroScrollMandate": false,
+    "hardwareAcceleration": true,
+    "serviceWorker": false,
+    "performanceLogging": true,
+    "debugOverlays": true
+  },
+  "kinetic": {
+    "traceLineMaxMs": 250,
+    "animationFPS": 60,
+    "gpuAcceleration": true
+  },
+  "apex": {
+    "refreshInterval": 5000,
+    "mockData": true
+  },
+  "build": {
+    "minify": false,
+    "sourceMaps": true,
+    "hashAssets": false
+  }
+}

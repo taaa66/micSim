@@ -1,0 +1,30 @@
+{
+  "environment": "qa",
+  "debug": true,
+  "api": {
+    "baseUrl": "https://qa-api.ophthalmo-sim.com/v1",
+    "wsUrl": "wss://qa-api.ophthalmo-sim.com/ws",
+    "timeout": 20000
+  },
+  "features": {
+    "zeroScrollMandate": true,
+    "hardwareAcceleration": true,
+    "serviceWorker": true,
+    "performanceLogging": true,
+    "debugOverlays": false
+  },
+  "kinetic": {
+    "traceLineMaxMs": 250,
+    "animationFPS": 60,
+    "gpuAcceleration": true
+  },
+  "apex": {
+    "refreshInterval": 10000,
+    "mockData": false
+  },
+  "build": {
+    "minify": true,
+    "sourceMaps": true,
+    "hashAssets": true
+  }
+}

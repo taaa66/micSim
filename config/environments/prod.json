@@ -1,0 +1,30 @@
+{
+  "environment": "production",
+  "debug": false,
+  "api": {
+    "baseUrl": "https://api.ophthalmo-sim.com/v1",
+    "wsUrl": "wss://api.ophthalmo-sim.com/ws",
+    "timeout": 15000
+  },
+  "features": {
+    "zeroScrollMandate": true,
+    "hardwareAcceleration": true,
+    "serviceWorker": true,
+    "performanceLogging": false,
+    "debugOverlays": false
+  },
+  "kinetic": {
+    "traceLineMaxMs": 250,
+    "animationFPS": 60,
+    "gpuAcceleration": true
+  },
+  "apex": {
+    "refreshInterval": 30000,
+    "mockData": false
+  },
+  "build": {
+    "minify": true,
+    "sourceMaps": false,
+    "hashAssets": true
+  }
+}
