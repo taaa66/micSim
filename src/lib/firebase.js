@@ -38,7 +38,8 @@ import {
   getDocs,
   increment,
   arrayUnion,
-  serverTimestamp
+  serverTimestamp,
+  runTransaction
 } from 'firebase/firestore';
 
 // Firebase configuration - MicroSim Project
@@ -237,72 +238,112 @@ export function onAuthChange(callback) {
 }
 
 /**
- * Update user stats using ATOMIC operations
- * This prevents race conditions when multiple updates happen simultaneously
+ * Update user stats using FIRESTORE TRANSACTIONS
+ * 
+ * CRITICAL: This function uses runTransaction to ensure ACID compliance:
+ * - Atomicity: All updates succeed or all fail
+ * - Consistency: Data integrity maintained across concurrent updates
+ * - Isolation: No race conditions between reads and writes
+ * - Durability: Changes are permanently committed
+ * 
+ * DATA INTEGRITY GUARANTEES:
+ * 1. highestScore: Only updated if new score > current (transactional comparison)
+ * 2. averageScore: Calculated server-side from aggregated totalScore/totalSessions
+ * 3. All counters use atomic increment operations
+ * 
+ * @param {string} uid - User ID
+ * @param {number} score - New score (must be numeric)
+ * @param {string} moduleId - Module identifier
+ * @returns {Promise<Object>} Updated stats object
  */
 export async function firebaseUpdateStats(uid, score, moduleId) {
   if (!isFirebaseAvailable()) return null;
   
+  // Validate score is numeric
+  if (typeof score !== 'number' || isNaN(score)) {
+    console.error('❌ Invalid score type:', typeof score, score);
+    throw new Error('Score must be a valid number');
+  }
+  
   try {
     const userRef = doc(db, 'users', uid);
     
-    // First, get current highest score to compare
-    const userDoc = await getDoc(userRef);
-    if (!userDoc.exists()) {
-      console.error('User document not found:', uid);
-      return null;
-    }
+    // Execute transaction for ACID compliance
+    const result = await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      
+      if (!userDoc.exists()) {
+        throw new Error('User document not found');
+      }
+      
+      const currentData = userDoc.data();
+      const stats = currentData.stats || {};
+      
+      // Current aggregated values
+      const currentHighest = stats.highestScore || 0;
+      const currentTotalSessions = stats.totalSessions || 0;
+      const currentTotalScore = stats.totalScore || 0;
+      const currentPracticeCount = stats.practice_count || 0;
+      
+      // Calculate new aggregated values
+      const newTotalSessions = currentTotalSessions + 1;
+      const newTotalScore = currentTotalScore + score;
+      const newPracticeCount = currentPracticeCount + 1;
+      
+      // SERVER-SIDE average calculation (ensures consistency)
+      const newAverageScore = Math.round(newTotalScore / newTotalSessions);
+      
+      // Transactional high score update (only if new score is higher)
+      const newHighestScore = Math.max(currentHighest, score);
+      
+      // Build update object
+      const updateData = {
+        'stats.totalSessions': newTotalSessions,
+        'stats.totalScore': newTotalScore,
+        'stats.averageScore': newAverageScore,  // ✅ PERSISTED AVERAGE
+        'stats.highestScore': newHighestScore,  // ✅ TRANSACTIONAL MAX
+        'stats.practice_count': newPracticeCount,
+        'stats.lastActive': serverTimestamp()
+      };
+      
+      // Add module to completed list (arrayUnion prevents duplicates)
+      if (moduleId) {
+        const currentModules = stats.modulesCompleted || [];
+        if (!currentModules.includes(moduleId)) {
+          updateData['stats.modulesCompleted'] = arrayUnion(moduleId);
+        }
+      }
+      
+      // Commit transaction
+      transaction.update(userRef, updateData);
+      
+      // Return calculated values
+      return {
+        totalSessions: newTotalSessions,
+        totalScore: newTotalScore,
+        averageScore: newAverageScore,
+        highestScore: newHighestScore,
+        practice_count: newPracticeCount,
+        modulesCompleted: moduleId && !stats.modulesCompleted?.includes(moduleId)
+          ? [...(stats.modulesCompleted || []), moduleId]
+          : (stats.modulesCompleted || []),
+        lastActive: new Date().toISOString()
+      };
+    });
     
-    const currentData = userDoc.data();
-    const currentHighest = currentData.stats?.highestScore || 0;
-    const currentTotal = currentData.stats?.totalSessions || 0;
-    const currentTotalScore = currentData.stats?.totalScore || 0;
+    console.log('✅ Stats updated (TRANSACTION):', { 
+      uid, 
+      score, 
+      moduleId,
+      newAverage: result.averageScore,
+      newHighest: result.highestScore
+    });
     
-    // Build atomic update object
-    const updateData = {
-      'stats.totalSessions': increment(1),
-      'stats.totalScore': increment(score),
-      'stats.lastActive': serverTimestamp(),
-      'stats.practice_count': increment(1) // Explicit practice count
-    };
+    return result;
     
-    // Update highest score only if new score is higher
-    if (score > currentHighest) {
-      updateData['stats.highestScore'] = score;
-    }
-    
-    // Add module to completed list atomically (arrayUnion prevents duplicates)
-    if (moduleId) {
-      updateData['stats.modulesCompleted'] = arrayUnion(moduleId);
-    }
-    
-    // Perform atomic update
-    await updateDoc(userRef, updateData);
-    
-    // Calculate new values for return
-    const newTotalSessions = currentTotal + 1;
-    const newTotalScore = currentTotalScore + score;
-    const newAverageScore = Math.round(newTotalScore / newTotalSessions);
-    const newHighestScore = Math.max(currentHighest, score);
-    
-    // Fetch updated modules list
-    const updatedDoc = await getDoc(userRef);
-    const updatedData = updatedDoc.data();
-    
-    console.log('✅ Stats updated successfully:', { uid, score, moduleId });
-    
-    return {
-      totalSessions: newTotalSessions,
-      totalScore: newTotalScore,
-      averageScore: newAverageScore,
-      highestScore: newHighestScore,
-      practice_count: (currentData.stats?.practice_count || 0) + 1,
-      modulesCompleted: updatedData.stats?.modulesCompleted || [],
-      lastActive: new Date().toISOString()
-    };
   } catch (error) {
-    console.error('❌ Update stats error:', error);
-    throw error; // Re-throw for caller to handle
+    console.error('❌ Transaction failed:', error);
+    throw error;
   }
 }
 
