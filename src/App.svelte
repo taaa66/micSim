@@ -21,9 +21,11 @@
 
   // Authentication
   import AuthScreen from './components/AuthScreen.svelte';
+  import UserPanel from './components/UserPanel.svelte';
   import { isLoggedIn, currentUser, displayName, updateUserStats } from './lib/authStore.js';
 
   let currentView = 'dashboard';
+  let userPanelOpen = false;
   let selectedSim = null;
   let selectedGame = null;
   let apexPanelOpen = true;
@@ -119,6 +121,9 @@
 {#if !$isLoggedIn}
   <AuthScreen on:authenticated={handleAuthenticated} />
 {:else}
+  <!-- User Panel (always visible when logged in) -->
+  <UserPanel bind:isOpen={userPanelOpen} />
+  
   <div class="app">
     {#if currentView === 'dashboard'}
       <RadialDashboard 
@@ -127,8 +132,8 @@
         on:coreGames={handleCoreGames}
       />
       
-      <!-- Apex Panel -->
-      <div class="apex-desktop">
+      <!-- Apex Panel - overlay on mobile/tablet -->
+      <div class="apex-panel-wrapper" class:open={apexPanelOpen}>
         <ApexLeaguePanel 
           bind:isOpen={apexPanelOpen}
           currentUser={$displayName}
@@ -171,26 +176,50 @@
     transform: translateZ(0);
   }
 
-  /* Apex Panel positioning */
-  .apex-desktop {
-    display: block;
+  /* Apex Panel wrapper - slide in from right */
+  .apex-panel-wrapper {
     position: fixed;
     top: 0;
     right: 0;
     height: 100%;
     z-index: 100;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .apex-desktop {
-      position: fixed;
-      bottom: 0;
+  .apex-panel-wrapper.open {
+    transform: translateX(0);
+  }
+
+  /* Desktop/Landscape - always show */
+  @media (min-width: 1024px) {
+    .apex-panel-wrapper {
+      transform: translateX(0);
+    }
+  }
+
+  /* Tablet Portrait - slide in */
+  @media (max-width: 1023px) {
+    .apex-panel-wrapper {
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* Mobile - bottom sheet style */
+  @media (max-width: 767px) {
+    .apex-panel-wrapper {
       top: auto;
+      bottom: 0;
       left: 0;
       right: 0;
       height: auto;
-      max-height: 50vh;
+      max-height: 60vh;
+      transform: translateY(100%);
+      border-radius: 20px 20px 0 0;
+    }
+    
+    .apex-panel-wrapper.open {
+      transform: translateY(0);
     }
   }
 </style>

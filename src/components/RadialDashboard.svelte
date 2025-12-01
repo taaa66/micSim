@@ -430,33 +430,47 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: min(330px, 36vw);
+    /* Apex panel is now overlay, no margin needed */
+    margin-right: 0;
     padding: clamp(6px, 2cqh, 16px) 10px;
     container-type: size;
-    /* Recompute radius using container query units with 98% buffer */
-    --radius: min(35cqw, 42cqh, 280px);
+    /* Recompute radius using container query units */
+    --radius: min(38cqw, 42cqh, 300px);
     --base-dist: calc(var(--radius) * 0.98);
   }
 
-  /* Tablet - make room for side panel */
-  @media (max-width: 1024px) and (min-width: 769px) {
+  /* iPad Portrait optimization */
+  @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
     .main-container {
-      margin-right: min(310px, 39vw);
+      --radius: min(42cqw, 38cqh, 280px);
+    }
+    .dashboard {
+      --card-size: min(85px, 13vw);
+    }
+  }
+
+  /* iPad Landscape - show panel on side */
+  @media (min-width: 1024px) {
+    .main-container {
+      margin-right: min(320px, 30vw);
     }
   }
   
-  /* Mobile - panel is at bottom, no margin needed */
-  @media (max-width: 768px) {
+  /* Mobile - full width */
+  @media (max-width: 767px) {
     .main-container {
       margin-right: 0;
-      margin-bottom: 50vh; /* Make room for bottom sheet */
+      --radius: min(40cqw, 35cqh, 200px);
+    }
+    .dashboard {
+      --card-size: min(70px, 18vw);
     }
   }
 
   /* Small-height tuning (iPad Safari UI visible) */
-  @media (max-height: 840px) {
-    .dashboard { --card-size: min(78px, 11vw); }
-    .main-container { --radius: min(32cqw, 36cqh, 240px); }
+  @media (max-height: 700px) {
+    .dashboard { --card-size: min(70px, 11vw); }
+    .main-container { --radius: min(30cqw, 32cqh, 200px); }
   }
 
   /* === DATA FLOW with streaming animation === */
