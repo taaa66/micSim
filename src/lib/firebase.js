@@ -41,20 +41,11 @@ import {
   serverTimestamp,
   runTransaction
 } from 'firebase/firestore';
+import { getFirebaseConfig, isFirebaseConfigured as checkConfig } from './firebaseConfig.js';
 
-// Firebase configuration - MicroSim Project
-const firebaseConfig = {
-  apiKey: "AIzaSyCjayCaQybHMevNzUNjdNv5Q54DPFa95e8",
-  authDomain: "microsim-c670b.firebaseapp.com",
-  projectId: "microsim-c670b",
-  storageBucket: "microsim-c670b.firebasestorage.app",
-  messagingSenderId: "622906420676",
-  appId: "1:622906420676:web:47bfe822eabfb8338f8891",
-  measurementId: "G-Z55HG8CPRL"
-};
-
-// Check if Firebase is configured
-const isFirebaseConfigured = !firebaseConfig.apiKey.includes('PLACEHOLDER');
+// Load Firebase configuration (supports env variables)
+const firebaseConfig = getFirebaseConfig();
+const isFirebaseConfigured = checkConfig(firebaseConfig);
 
 // Initialize Firebase (only if configured)
 let app = null;

@@ -40,8 +40,16 @@ export default defineConfig({
     target: 'esnext',
     minify: 'terser',
     sourcemap: false,
-    // Ensure assets are inlined or properly referenced
     assetsInlineLimit: 4096,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          'vendor': ['svelte'],
+        },
+      },
+    },
   },
   
   // Optimize deps for faster dev server start
