@@ -64,11 +64,11 @@
         <span class="stat-label">אימונים</span>
       </div>
       <div class="stat">
-        <span class="stat-value">{$currentUser?.stats?.highestScore || 0}</span>
-        <span class="stat-label">שיא ניקוד</span>
+        <span class="stat-value">{Math.round($currentUser?.stats?.highestScore || 0)}</span>
+        <span class="stat-label">שיא</span>
       </div>
       <div class="stat">
-        <span class="stat-value">{$currentUser?.stats?.averageScore || 0}</span>
+        <span class="stat-value">{Math.round($currentUser?.stats?.averageScore || 0)}</span>
         <span class="stat-label">ממוצע</span>
       </div>
       <div class="stat">
@@ -112,8 +112,8 @@
 <style>
   .user-btn {
     position: fixed;
-    top: 12px;
-    left: 12px;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -126,6 +126,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .user-btn:hover, .user-btn.open {
@@ -176,8 +177,8 @@
 
   .user-panel {
     position: fixed;
-    top: 60px;
-    left: 12px;
+    top: calc(max(12px, env(safe-area-inset-top, 0px)) + 48px);
+    left: max(12px, env(safe-area-inset-left, 0px));
     z-index: 1001;
     width: 280px;
     background: rgba(10, 26, 31, 0.98);
@@ -185,6 +186,7 @@
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
     direction: rtl;
   }
 
@@ -334,7 +336,13 @@
     height: 18px;
   }
 
-  /* Mobile adjustments */
+  /* Tablet & Mobile adjustments */
+  @media (max-width: 1024px) {
+    .user-panel {
+      max-width: calc(100vw - 24px);
+    }
+  }
+
   @media (max-width: 768px) {
     .user-name {
       display: none;
@@ -345,9 +353,28 @@
     }
 
     .user-panel {
-      left: 8px;
-      right: 8px;
+      left: max(8px, env(safe-area-inset-left, 0px));
+      right: max(8px, env(safe-area-inset-right, 0px));
       width: auto;
+      max-width: none;
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+  }
+  
+  /* iOS notch support */
+  @supports (padding: max(0px)) {
+    .user-btn {
+      top: max(12px, env(safe-area-inset-top));
+      left: max(12px, env(safe-area-inset-left));
+    }
+    
+    .user-panel {
+      top: calc(max(12px, env(safe-area-inset-top)) + 48px);
+      left: max(12px, env(safe-area-inset-left));
     }
   }
 </style>
