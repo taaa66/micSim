@@ -17,6 +17,35 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // ================================================================
+    // VALIDATION FUNCTIONS (must be inside service block)
+    // ================================================================
+    
+    // Validate new user profile structure
+    function validateUserProfile(data) {
+      return data.keys().hasAll(['uid', 'idNumber', 'fullName', 'specialty', 'createdAt', 'stats'])
+             && data.uid is string
+             && data.idNumber is string
+             && data.fullName is string
+             && data.fullName.size() >= 2
+             && data.specialty is string
+             && data.stats is map;
+    }
+    
+    // Validate user update (only allow stats changes)
+    function validateUserUpdate(newData, oldData) {
+      // Core identity fields cannot change
+      return newData.uid == oldData.uid
+             && newData.idNumber == oldData.idNumber
+             && newData.fullName == oldData.fullName
+             && newData.specialty == oldData.specialty
+             && newData.createdAt == oldData.createdAt
+             && newData.stats is map
+             // Ensure practice_count can only increase (atomic increment)
+             && (newData.stats.practice_count >= oldData.stats.practice_count 
+                 || !('practice_count' in oldData.stats));
+    }
+    
+    // ================================================================
     // USERS COLLECTION
     // ================================================================
     match /users/{userId} {
@@ -41,10 +70,8 @@ service cloud.firestore {
     // ================================================================
     // LEADERBOARD ACCESS
     // ================================================================
-    // Separate read rule for leaderboard queries
+    // Any authenticated user can list users for leaderboard
     match /users/{userId} {
-      // Any authenticated user can read leaderboard data
-      // (full profile data is protected by the more specific rule above)
       allow list: if request.auth != null;
     }
     
@@ -55,33 +82,4 @@ service cloud.firestore {
       allow read, write: if false;
     }
   }
-}
-
-// ================================================================
-// VALIDATION FUNCTIONS
-// ================================================================
-
-// Validate new user profile structure
-function validateUserProfile(data) {
-  return data.keys().hasAll(['uid', 'idNumber', 'fullName', 'specialty', 'createdAt', 'stats'])
-         && data.uid is string
-         && data.idNumber is string
-         && data.fullName is string
-         && data.fullName.size() >= 2
-         && data.specialty is string
-         && data.stats is map;
-}
-
-// Validate user update (only allow stats changes)
-function validateUserUpdate(newData, oldData) {
-  // Core identity fields cannot change
-  return newData.uid == oldData.uid
-         && newData.idNumber == oldData.idNumber
-         && newData.fullName == oldData.fullName
-         && newData.specialty == oldData.specialty
-         && newData.createdAt == oldData.createdAt
-         && newData.stats is map
-         // Ensure practice_count can only increase (atomic increment)
-         && (newData.stats.practice_count >= oldData.stats.practice_count 
-             || !('practice_count' in oldData.stats));
 }
