@@ -120,31 +120,32 @@
     gap: 8px;
     padding: 6px 12px 6px 6px;
     background: rgba(10, 26, 31, 0.95);
-    border: 1px solid rgba(15, 184, 159, 0.3);
+    border: 1px solid var(--border-cyan);
     border-radius: 30px;
-    color: #e0f5f0;
+    color: var(--cyan-400);
     cursor: pointer;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
   }
 
   .user-btn:hover, .user-btn.open {
-    border-color: rgba(15, 184, 159, 0.6);
-    background: rgba(15, 184, 159, 0.1);
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   }
 
   .avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0fb89f 0%, #34d399 100%);
+    background: radial-gradient(circle at 30% 30%, var(--cyan-400) 0%, var(--cyan-700) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 14px;
-    color: #040d10;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
   }
 
   .user-name {
@@ -181,13 +182,19 @@
     left: max(12px, env(safe-area-inset-left, 0px));
     z-index: 1001;
     width: 280px;
-    background: rgba(10, 26, 31, 0.98);
-    border: 1px solid rgba(15, 184, 159, 0.3);
-    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(10, 14, 20, 0.98), rgba(15, 20, 25, 0.98));
+    border: 1px solid var(--border-cyan);
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
     direction: rtl;
+    clip-path: polygon(
+      12px 0, 100% 0, 
+      100% calc(100% - 12px), 
+      calc(100% - 12px) 100%, 
+      0 100%, 0 12px
+    );
   }
 
   .user-info {
@@ -195,7 +202,7 @@
     align-items: center;
     gap: 12px;
     padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
     margin-bottom: 16px;
   }
 
@@ -203,19 +210,22 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0fb89f 0%, #34d399 100%);
+    background: radial-gradient(circle at 30% 30%, var(--cyan-400) 0%, var(--cyan-700) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 22px;
-    color: #040d10;
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
   }
 
   .user-details h3 {
     font-size: 16px;
     font-weight: 700;
-    color: #fff;
+    color: var(--cyan-400);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    font-family: var(--font-display);
     margin: 0 0 4px;
   }
 
@@ -234,7 +244,8 @@
   .stat {
     text-align: center;
     padding: 10px 4px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.1);
     border-radius: 10px;
   }
 
@@ -242,7 +253,8 @@
     display: block;
     font-size: 18px;
     font-weight: 700;
-    color: #34d399;
+    color: var(--cyan-400);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   }
 
   .stat-label {

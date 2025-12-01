@@ -400,29 +400,87 @@
     background-clip: text;
   }
   
-  /* ===== MAIN PANEL ===== */
+  /* ===== MAIN PANEL (Futuristic) ===== */
   .apex-panel {
     position: fixed;
     top: max(12px, env(safe-area-inset-top));
-    right: max(8px, env(safe-area-inset-right));
+    right: max(12px, env(safe-area-inset-right));
     bottom: max(12px, env(safe-area-inset-bottom));
-    width: min(320px, 35vw);
-    max-height: calc(95vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    width: min(340px, 35vw); /* Slightly wider */
+    max-height: calc(98vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     background: linear-gradient(145deg, 
-      rgba(10, 26, 31, 0.98) 0%, 
-      rgba(15, 35, 42, 0.98) 100%
+      rgba(10, 14, 20, 0.98) 0%, 
+      rgba(15, 20, 25, 0.98) 100%
     );
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    border-radius: 10px;
+    border: 1px solid var(--border-cyan);
+    border-radius: var(--radius-chamfer); /* Chamfered look via clip-path preferred, but radius ok for now */
+    clip-path: polygon(
+      20px 0, 100% 0, 
+      100% calc(100% - 20px), 
+      calc(100% - 20px) 100%, 
+      0 100%, 0 20px
+    );
     padding: 0;
     z-index: 100;
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
     box-shadow: 
-      0 0 40px rgba(0, 0, 0, 0.6),
-      0 0 20px rgba(212, 175, 55, 0.1);
+      0 0 40px rgba(0, 0, 0, 0.8),
+      0 0 20px rgba(0, 255, 255, 0.1);
     backdrop-filter: blur(20px);
+  }
+  
+  .panel-header {
+    padding: 20px 24px;
+    background: linear-gradient(180deg, 
+      rgba(0, 255, 255, 0.05) 0%, 
+      transparent 100%
+    );
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  }
+  
+  .league-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0;
+    color: var(--cyan-400);
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    background: none;
+    -webkit-text-fill-color: initial;
+  }
+  
+  .status-badge {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid var(--cyan-600);
+  }
+  
+  .status-badge.active .status-dot {
+    background: var(--cyan-400);
+    box-shadow: 0 0 8px var(--cyan-400);
+  }
+  
+  .leaderboard-grid {
+    background: rgba(10, 14, 20, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.1);
+  }
+  
+  .grid-header {
+    background: rgba(0, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    color: var(--cyan-400);
+  }
+  
+  .col-score {
+    color: var(--cyan-400);
+  }
+  
+  .col-tag.winner {
+    background: rgba(0, 255, 255, 0.15);
+    color: var(--cyan-400);
+    border: 1px solid var(--cyan-600);
   }
   
   .apex-panel.finalized {

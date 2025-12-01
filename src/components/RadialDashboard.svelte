@@ -428,8 +428,8 @@
     --text: #ffffff;
     --text-muted: #7aa8a0;
     --gold: #d4a853;
-    --card-size: min(90px, 12vw);
-    --radius: min(35vw, 35vh, 280px);
+    --card-size: min(110px, 14vw); /* Increased size */
+    --radius: min(32vw, 32vh, 260px); /* Slightly reduced radius */
     
     width: 100%;
     height: 100vh;
@@ -789,53 +789,67 @@
   /* Module Icon */
   .module-icon {
     position: absolute;
-    top: 50%;
+    top: 45%; /* Move up slightly */
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
+    opacity: 0.9;
+    transition: all 0.3s ease;
   }
   
   .module-card:hover .module-icon {
     opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
   }
   
   .icon-num {
     position: absolute;
-    top: 8%;
-    right: 12%;
-    font-size: clamp(10px, 2.5vw, 14px);
+    top: 12%;
+    right: 15%;
+    font-size: clamp(10px, 2.5vw, 12px);
     font-weight: 700;
     color: var(--cyan-400);
     font-family: var(--font-display);
     z-index: 3;
     text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    background: rgba(10, 26, 31, 0.8); /* Improve contrast */
+    padding: 1px 4px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
   }
 
   .card-content {
     position: absolute;
-    bottom: 8%;
+    bottom: 12%; /* Move up to avoid clip */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1px;
+    gap: 2px;
     z-index: 1;
-    width: 90%;
+    width: 95%; /* Wider to prevent wrap */
   }
   .card-name {
-    font-size: clamp(5px, 1.2vw, 7px);
-    font-weight: 700;
+    font-size: clamp(7px, 1.2vw, 9px); /* Increased size */
+    font-weight: 600;
     color: var(--text);
     text-align: center;
     line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
   .card-code {
-    font-size: clamp(5px, 1vw, 6px);
-    color: var(--accent);
-    font-weight: 600;
+    font-size: clamp(6px, 1vw, 7px);
+    color: var(--cyan-400);
+    font-weight: 500;
+    opacity: 0.8;
+    letter-spacing: 1px;
   }
   .check {
     color: var(--accent-bright);
