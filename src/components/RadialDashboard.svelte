@@ -428,8 +428,8 @@
     --text: #ffffff;
     --text-muted: #7aa8a0;
     --gold: #d4a853;
-    --card-size: min(110px, 14vw); /* Increased size */
-    --radius: min(32vw, 32vh, 260px); /* Slightly reduced radius */
+    --card-size: min(115px, 15vw); /* Slightly larger cards */
+    --radius: min(36vw, 36vh, 300px); /* Expanded radius for breathing room */
     
     width: 100%;
     height: 100vh;
@@ -820,36 +820,42 @@
 
   .card-content {
     position: absolute;
-    bottom: 12%; /* Move up to avoid clip */
+    bottom: 10%; /* Slightly lower */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
     z-index: 1;
-    width: 95%; /* Wider to prevent wrap */
+    width: 92%; /* Slightly tighter to avoid edge collision */
   }
   .card-name {
-    font-size: clamp(7px, 1.2vw, 9px); /* Increased size */
-    font-weight: 600;
+    font-size: clamp(7px, 1.1vw, 9px);
+    font-weight: 700;
     color: var(--text);
     text-align: center;
-    line-height: 1.1;
+    line-height: 1.2; /* Better line height for wrap */
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal; /* Allow wrapping */
     max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .card-code {
-    font-size: clamp(6px, 1vw, 7px);
+    font-size: clamp(6px, 0.9vw, 8px);
     color: var(--cyan-400);
-    font-weight: 500;
-    opacity: 0.8;
+    font-weight: 600;
+    opacity: 0.9;
     letter-spacing: 1px;
+    background: rgba(0, 255, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 3px;
   }
   .check {
     color: var(--accent-bright);

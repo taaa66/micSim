@@ -66,10 +66,20 @@
       <div class="stat">
         <span class="stat-value">{Math.round($currentUser?.stats?.highestScore || 0)}</span>
         <span class="stat-label">שיא</span>
+        <div class="sparkline">
+          <svg viewBox="0 0 60 20" width="60" height="20" fill="none" stroke="var(--cyan-400)" stroke-width="2">
+            <polyline points="0,15 10,12 20,18 30,8 40,14 50,5 60,10" />
+          </svg>
+        </div>
       </div>
       <div class="stat">
         <span class="stat-value">{Math.round($currentUser?.stats?.averageScore || 0)}</span>
         <span class="stat-label">ממוצע</span>
+        <div class="sparkline">
+          <svg viewBox="0 0 60 20" width="60" height="20" fill="none" stroke="#7aa8a0" stroke-width="2">
+            <polyline points="0,10 10,10 20,10 30,10 40,10 50,10 60,10" stroke-dasharray="4 2"/>
+          </svg>
+        </div>
       </div>
       <div class="stat">
         <span class="stat-value">{$currentUser?.stats?.modulesCompleted?.length || 0}</span>
@@ -262,6 +272,11 @@
     font-size: 9px;
     color: #7aa8a0;
     margin-top: 2px;
+  }
+
+  .sparkline {
+    margin-top: 4px;
+    opacity: 0.7;
   }
 
   .info-section {
