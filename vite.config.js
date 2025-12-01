@@ -3,8 +3,8 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // GitHub Pages - change 'micro-sim-svelte' to your repo name if different
-  base: '/micro-sim-svelte/',
+  // GitHub Pages base path
+  base: '/micSim/',
   
   plugins: [svelte()],
   
