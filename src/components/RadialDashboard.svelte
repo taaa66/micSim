@@ -3,6 +3,7 @@
   import { currentModuleContext } from '../lib/contextStore.js';
   import { audio } from '../lib/audio.js';
   import TorqueGauge from './TorqueGauge.svelte';
+  import OrganicBackground from './OrganicBackground.svelte';
   import { fade, fly, scale } from 'svelte/transition';
   import { cubicOut, elasticOut } from 'svelte/easing';
 
@@ -186,6 +187,9 @@
 </script>
 
 <div class="dashboard" class:booting={bootPhase < 5}>
+  <!-- Organic Background Layer -->
+  <OrganicBackground />
+  
   <!-- Header -->
   <header class="header" class:visible={bootPhase >= 1}>
     <div class="header-center">
@@ -212,7 +216,7 @@
   <div class="main-container" class:dim={!!selectedModule}>
     <!-- V12 Ambient AO overlay -->
     <div class="ambient-ao" class:warning={systemStatus==='WARNING'} aria-hidden="true"></div>
-    <!-- Data Flow Lines with streaming animation -->
+    <!-- Data Flow Lines - SIMPLE & STABLE -->
     <svg class="data-flow" viewBox="-50 -50 100 100">
       <defs>
         <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -520,26 +524,30 @@
     .main-container { --radius: min(30cqw, 32cqh, 200px); }
   }
 
-  /* === DATA FLOW with streaming animation === */
+  /* === DATA FLOW - SIMPLE & STABLE === */
   .data-flow {
     position: absolute;
     width: calc(var(--radius) * 2.5);
     height: calc(var(--radius) * 2.5);
     pointer-events: none;
   }
+  
   .flow-pulse {
     stroke-dasharray: 5 30;
     animation: flowStream 2s linear infinite;
     animation-delay: var(--delay, 0s);
   }
+  
   @keyframes flowStream {
     0% { stroke-dashoffset: 40; opacity: 0; }
     50% { opacity: 1; }
     100% { stroke-dashoffset: 0; opacity: 0; }
   }
+  
   .orbit-ring {
     animation: orbitPulse 4s ease-in-out infinite;
   }
+  
   @keyframes orbitPulse {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 0.4; }
@@ -648,6 +656,7 @@
     padding: 5px;
     z-index: 6;
   }
+  
   /* Z-axis lift on hover */
   .module-card:hover, .module-card.hovered {
     border-color: var(--accent-bright);
