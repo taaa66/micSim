@@ -8,18 +8,41 @@
 
   const dispatch = createEventDispatcher();
 
+  // Modules ranked by Educational Value (Research-Based)
+  // Rank 1-5: CORE (Must-Have) | Rank 6-8: USEFUL | Rank 9-11: Optional/Low-Value
   const allModules = [
-    { id: 'micro-tremor', num: 1, name: 'MICRO-TREMOR', code: 'MT-CTRL', goal: 'Hold steady in target zones.', metrics: [{l:'STAB',v:85},{l:'ACC',v:92},{l:'TREM',v:78}], mastery: 85, completed: true, core: true, skills: ['Tremor Suppression','Stability','Spatial Accuracy'], prevents: ['Instrument Slippage','Tissue Contact','Capsular Damage'] },
-    { id: 'tissue-grasping', num: 2, name: 'TISSUE GRASP', code: 'T-GRASP', goal: 'Grasp without overstretching.', metrics: [{l:'FORCE',v:70},{l:'PRESS',v:88},{l:'HOLD',v:95}], mastery: 72, completed: false, skills: ['Grasping Force','Pressure Control','Hold Stability'], prevents: ['Crush Injury','Capsular Tear','Zonular Stress'] },
-    { id: 'needle-angle', num: 3, name: 'NEEDLE ANGLE', code: 'N-ANGLE', goal: 'Insert at precise angles.', metrics: [{l:'ANGLE',v:92},{l:'DEPTH',v:85},{l:'UNIF',v:90}], mastery: 92, completed: true, skills: ['Angle Control','Depth Control','Pressure Uniformity'], prevents: ['Iris Trauma','Lens Touch','Wound Architecture'] },
-    { id: 'corneal-tunnel', num: 4, name: 'CORNEAL TUNNEL', code: 'C-TUNEL', goal: 'Create self-sealing wound.', metrics: [{l:'PATH',v:65},{l:'DEPTH',v:70},{l:'SEAL',v:60}], mastery: 65, completed: false, skills: ['Angle Control','Depth Control','Path Accuracy'], prevents: ['Wound Leak','Astigmatism','Thermal Burn'] },
-    { id: 'capsulorhexis', num: 5, name: 'CAPSULORHEXIS', code: 'CCC', goal: 'Continuous curvilinear tear.', metrics: [{l:'PATH',v:95},{l:'FORCE',v:88},{l:'SMTH',v:92}], mastery: 95, completed: true, core: true, skills: ['Path Accuracy','Stability','Force Control'], prevents: ['Capsule Runout','PCR','Residual Flap'] },
-    { id: 'hydrodissection', num: 6, name: 'HYDRODISSECT', code: 'H-DISS', goal: 'Controlled fluid wave.', metrics: [{l:'FLOW',v:45},{l:'PRESS',v:60},{l:'WAVE',v:50}], mastery: 45, completed: false, skills: ['Flow Control','Pressure Sensing','Wave Visualization'], prevents: ['Zonular Dialysis','Pressure Spike','Incomplete Sep'] },
-    { id: 'suture-tension', num: 7, name: 'SUTURE TENS', code: 'S-TENS', goal: 'Precise knot tension.', metrics: [{l:'TENS',v:88},{l:'CONS',v:85},{l:'GAPE',v:90}], mastery: 88, completed: true, core: true, skills: ['Tension Control','Consistency','Force Sensing'], prevents: ['Wound Gape','Tissue Necrosis','Cheese-Wire'] },
-    { id: 'corneal-suture', num: 8, name: 'SUTURE PLACE', code: 'S-PLACE', goal: 'Symmetric entry/exit.', metrics: [{l:'SYM',v:75},{l:'DEPTH',v:80},{l:'PATH',v:70}], mastery: 75, completed: false, skills: ['Angle Control','Depth Uniformity','Path Accuracy'], prevents: ['Astigmatism','Wound Gape','Cheese-Wiring'] },
-    { id: 'gas-injection', num: 9, name: 'GAS/LIQ INJ', code: 'FL-INJK', goal: 'Flow rate control.', metrics: [{l:'FLOW',v:60},{l:'PRESS',v:65},{l:'STAB',v:70}], mastery: 60, completed: false, skills: ['Flow Rate','Pressure Control','Angle Stability'], prevents: ['Retinal Damage','IOP Spike','Tamponade'] },
-    { id: 'reflex-floaters', num: 10, name: 'REFLEX/REACT', code: 'RLX-RCT', goal: 'Rapid target acquisition.', metrics: [{l:'REACT',v:98},{l:'ACC',v:95},{l:'STAB',v:92}], mastery: 98, completed: true, core: true, skills: ['Reaction Time','Correction Accuracy','Stabilization'], prevents: ['Delayed Response','Overcorrection','Collision'] },
-    { id: 'corneal-arc', num: 11, name: 'CORNEAL ARC', code: 'ARC-CUT', goal: 'Precise arcuate incisions.', metrics: [{l:'PATH',v:40},{l:'DEPTH',v:50},{l:'SLIP',v:45}], mastery: 40, completed: false, skills: ['Path Precision','Depth Control','Slip Prevention'], prevents: ['Over-Correction','Perforation','Irregular Astig'] }
+    // RANK 1: Capsulorhexis (Educational Value: 5/5, Frequency: 5/5, Complication: 5/5)
+    { id: 'capsulorhexis', num: 1, name: 'CAPSULORHEXIS', code: 'CCC', goal: 'Continuous curvilinear capsular tear (5-5.5mm).', metrics: [{l:'PATH',v:95},{l:'FORCE',v:88},{l:'CIRC',v:92}], mastery: 95, completed: true, core: true, rank: 1, pgyStage: 'PGY-2 Early', difficulty: 'CRITICAL', skills: ['Path Accuracy','Stability','Angle Control'], prevents: ['Capsule Runout','PCR (Posterior Capsule Rupture)','Radial Tear Extension'], hapticNote: 'Limited - Requires visual force feedback' },
+    
+    // RANK 2: Corneal Tunnel (Educational Value: 4/5, Frequency: 5/5, Complication: 4/5)
+    { id: 'corneal-tunnel', num: 2, name: 'CORNEAL TUNNEL', code: 'C-TUNEL', goal: 'Self-sealing bi-planar incision.', metrics: [{l:'ANGLE',v:65},{l:'DEPTH',v:70},{l:'SEAL',v:60}], mastery: 65, completed: false, core: true, rank: 2, pgyStage: 'PGY-2 Mid', difficulty: 'HIGH', skills: ['Angle Control','Depth Control','Path Accuracy'], prevents: ['Wound Leakage','Surgically Induced Astigmatism','Thermal Burn','Iris Incarceration'] },
+    
+    // RANK 3: Micro-Tremor Control (Educational Value: 4/5, Frequency: 5/5, Complication: 3/5)
+    { id: 'micro-tremor', num: 3, name: 'MICRO-TREMOR', code: 'MT-CTRL', goal: 'Suppress physiologic tremor in target zones.', metrics: [{l:'STAB',v:85},{l:'ACC',v:92},{l:'TREM',v:78}], mastery: 85, completed: true, core: true, rank: 3, pgyStage: 'PGY-2 Early', difficulty: 'FUNDAMENTAL', skills: ['Tremor Suppression','Stability','Spatial Accuracy'], prevents: ['Iatrogenic Injury','Instrument Slippage','Capsular/Iris Damage'], hapticNote: 'Ideal for stylus - Pure kinematics' },
+    
+    // RANK 4: Tissue Grasping (Educational Value: 3/5, Frequency: 5/5, Complication: 2/5)
+    { id: 'tissue-grasping', num: 4, name: 'TISSUE GRASP', code: 'T-GRASP', goal: 'Controlled grasping without crush injury.', metrics: [{l:'FORCE',v:70},{l:'PRESS',v:88},{l:'HOLD',v:95}], mastery: 72, completed: false, core: true, rank: 4, pgyStage: 'PGY-2 Early', difficulty: 'FOUNDATIONAL', skills: ['Grasping Force Control','Pressure Sensing','Hand-Eye Coordination'], prevents: ['Capsule Crush','Iris Trauma','Endothelial Cell Damage'], hapticNote: 'Requires force quantification display' },
+    
+    // RANK 5: Needle Angle (Educational Value: 3/5, Frequency: 3/5, Complication: 4/5)
+    { id: 'needle-angle', num: 5, name: 'NEEDLE ANGLE', code: 'N-ANGLE', goal: 'Precise paracentesis & IVT injection angles.', metrics: [{l:'ANGLE',v:92},{l:'DEPTH',v:85},{l:'TRACT',v:90}], mastery: 92, completed: true, core: true, rank: 5, pgyStage: 'PGY-2 Mid', difficulty: 'IMPORTANT', skills: ['Angle Control','Depth Control','Counter-Traction'], prevents: ['Retinal Damage (IVT)','Lens Touch','Wound Architecture Failure'] },
+    
+    // RANK 6: Corneal Suture Placement (Educational Value: 3/5, Frequency: 3/5, Complication: 5/5)
+    { id: 'corneal-suture', num: 6, name: 'SUTURE PLACE', code: 'S-PLACE', goal: 'Symmetric depth & uniform bite length.', metrics: [{l:'SYM',v:75},{l:'DEPTH',v:80},{l:'BITE',v:70}], mastery: 75, completed: false, rank: 6, pgyStage: 'PGY-3 Mid', difficulty: 'HIGH', skills: ['Angle Control','Depth Uniformity','Path Accuracy'], prevents: ['Astigmatism','Wound Gape','Cheese-Wiring'], note: 'Core for Cornea Track' },
+    
+    // RANK 7: Suture Tension (Educational Value: 4/5, Frequency: 3/5, Complication: 5/5)
+    { id: 'suture-tension', num: 7, name: 'SUTURE TENS', code: 'S-TENS', goal: 'Optimal knot tension (visual force gauge).', metrics: [{l:'TENS',v:88},{l:'CONS',v:85},{l:'GAPE',v:90}], mastery: 88, completed: true, rank: 7, pgyStage: 'PGY-3 Late', difficulty: 'REFINEMENT', skills: ['Tension Control','Consistency','Force Sensing'], prevents: ['Wound Gape','Astigmatism','Tissue Necrosis'], hapticNote: 'High haptic demand - Sensory substitution required' },
+    
+    // RANK 8: Gas/Liquid Injection (Educational Value: 2/5, Frequency: 2/5, Complication: 3/5)
+    { id: 'gas-injection', num: 8, name: 'GAS/LIQ INJ', code: 'FL-INJK', goal: 'Controlled flow rate & IOP management.', metrics: [{l:'FLOW',v:60},{l:'PRESS',v:65},{l:'STAB',v:70}], mastery: 60, completed: false, rank: 8, pgyStage: 'PGY-4 Early', difficulty: 'NICHE', skills: ['Flow Rate Regulation','Pressure Control','Angle Stability'], prevents: ['IOP Spike','Descemet Membrane Detachment','Retinal Damage'], note: 'Core for Retina Track' },
+    
+    // RANK 9: Corneal Arc (Educational Value: 1/5, Frequency: 1/5, Complication: 2/5)
+    { id: 'corneal-arc', num: 9, name: 'CORNEAL ARC', code: 'ARC-CUT', goal: 'Limbal relaxing incisions (elective).', metrics: [{l:'PATH',v:40},{l:'DEPTH',v:50},{l:'SLIP',v:45}], mastery: 40, completed: false, rank: 9, pgyStage: 'PGY-4 Optional', difficulty: 'ELECTIVE', skills: ['Path Precision','Depth Control','Slip Prevention'], prevents: ['Over-Correction','Perforation','Irregular Astigmatism'], note: 'Low educational value - Refractive only' },
+    
+    // RANK 10: Reflex/Floaters (Educational Value: 1/5, Frequency: 1/5, Complication: 1/5)
+    { id: 'reflex-floaters', num: 10, name: 'REFLEX/REACT', code: 'RLX-RCT', goal: 'YAG vitreolysis targeting (diagnostic).', metrics: [{l:'REACT',v:98},{l:'ACC',v:95},{l:'STAB',v:92}], mastery: 98, completed: true, rank: 10, pgyStage: 'N/A', difficulty: 'NON-SURGICAL', skills: ['Reaction Time','Target Acquisition','Stabilization'], prevents: ['N/A - Not surgical motor skill'], note: 'NOT RECOMMENDED - Laser procedure, not surgical' },
+    
+    // RANK 6 (ESSENTIAL MISSING): Hydrodissection Control
+    { id: 'hydrodissection', num: 11, name: 'HYDRODISSECT', code: 'H-DISS', goal: 'Controlled fluid wave visualization.', metrics: [{l:'FLOW',v:45},{l:'PRESS',v:60},{l:'WAVE',v:50}], mastery: 45, completed: false, core: true, rank: 6, pgyStage: 'PGY-2 Mid', difficulty: 'ESSENTIAL', skills: ['Flow Control','Pressure Sensing','Wave Visualization'], prevents: ['Zonular Dialysis','Zonular Stress','Incomplete Cortical Separation'], note: 'ESSENTIAL MISSING MODULE - Prevents zonular complications' }
   ];
 
   let selectedModule = null;
@@ -278,7 +301,31 @@
         <div class="detail-stats">
           <div class="stat-box"><span>MASTERY</span><strong>{selectedModule.mastery}%</strong></div>
           <div class="stat-box"><span>STATUS</span><strong class={selectedModule.completed ? 'green' : 'amber'}>{selectedModule.completed ? 'COMPLETE' : 'IN PROGRESS'}</strong></div>
+          {#if selectedModule.rank}
+            <div class="stat-box rank"><span>RANK</span><strong class:core={selectedModule.rank <= 5}>#{selectedModule.rank}</strong></div>
+          {/if}
         </div>
+        
+        <!-- Research-Based Metadata -->
+        {#if selectedModule.pgyStage || selectedModule.difficulty}
+          <div class="detail-meta">
+            {#if selectedModule.pgyStage}
+              <span class="meta-badge pgy">{selectedModule.pgyStage}</span>
+            {/if}
+            {#if selectedModule.difficulty}
+              <span class="meta-badge difficulty" class:critical={selectedModule.difficulty === 'CRITICAL'}>
+                {selectedModule.difficulty}
+              </span>
+            {/if}
+          </div>
+        {/if}
+        
+        {#if selectedModule.hapticNote}
+          <div class="haptic-note">
+            <span class="note-icon">ℹ️</span>
+            <span class="note-text">{selectedModule.hapticNote}</span>
+          </div>
+        {/if}
 
         {#if selectedModule.id === 'capsulorhexis'}
           <div class="detail-section">
@@ -776,6 +823,61 @@
   }
   .stat-box strong.amber { color: #f59e0b; }
   .stat-box strong.green { color: var(--accent-bright); }
+  .stat-box.rank strong { color: #fbbf24; }
+  .stat-box.rank strong.core { color: #34d399; font-weight: 800; }
+  
+  /* Research metadata badges */
+  .detail-meta {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+  }
+  .meta-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .meta-badge.pgy {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+  }
+  .meta-badge.difficulty {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+  }
+  .meta-badge.difficulty.critical {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+  }
+  
+  /* Haptic limitation note */
+  .haptic-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid #3b82f6;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .note-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .note-text {
+    font-size: 11px;
+    color: #93c5fd;
+    line-height: 1.4;
+  }
+  
   .detail-section { margin-bottom: 16px; }
   /* V12 Tension Delta gauge */
   .tension-gauge { display:flex; align-items:center; gap:10px; }
