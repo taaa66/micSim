@@ -36,7 +36,7 @@
     draw(ctx) {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(180, 60%, 60%, ${this.opacity})`;
+      ctx.fillStyle = `hsla(168, 76%, 42%, ${this.opacity * 0.6})`;
       ctx.fill();
     }
   }
@@ -103,7 +103,7 @@
     const centerY = canvas.height / 2;
     
     ctx.beginPath();
-    ctx.strokeStyle = `hsla(180, 60%, 60%, ${0.05 + Math.sin(time * 0.5) * 0.03})`;
+    ctx.strokeStyle = `hsla(168, 76%, 42%, ${0.03 + Math.sin(time * 0.5) * 0.02})`;
     ctx.lineWidth = 1;
     
     let angle = 0;
@@ -129,9 +129,8 @@
   function animate() {
     time += 1;
     
-    // Subtle fade instead of clear
-    ctx.fillStyle = 'rgba(3, 10, 13, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Clear with transparent to let CSS background show through
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Draw golden spiral (very subtle)
     drawGoldenSpiral();
