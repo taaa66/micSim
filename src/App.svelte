@@ -38,6 +38,9 @@
   import AnalyticsDashboard from './components/analytics/AnalyticsDashboard.svelte';
   import { recordSession } from './lib/analyticsStore.js';
 
+  // Rota Management
+  import { RotaHub } from './modules/rota';
+
   let currentView = 'dashboard';
   let userPanelOpen = false;
   let selectedSim = null;
@@ -120,6 +123,10 @@
 
   function handleOkapGames() {
     currentView = 'okap-hub';
+  }
+
+  function handleRota() {
+    currentView = 'rota';
   }
 
   function handleSelectOkapGame(game) {
@@ -227,6 +234,7 @@
         on:moduleHover={handleModuleHover}
         on:coreGames={handleCoreGames}
         on:okapGames={handleOkapGames}
+        on:rota={handleRota}
       />
       
       <!-- Apex Panel - overlay on mobile/tablet -->
@@ -267,6 +275,11 @@
       this={okapGameComponents[selectedOkapGame.id]}
       onComplete={handleOkapGameComplete}
       onBack={handleBackFromOkapGame}
+    />
+  {:else if currentView === 'rota'}
+    <RotaHub 
+      onBack={handleBackToDashboard}
+      userId={$currentUser?.id || 'user-1'}
     />
   {/if}
   </div>

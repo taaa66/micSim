@@ -404,6 +404,15 @@
     </button>
   {/if}
 
+  <!-- Rota Management Button -->
+  {#if bootPhase >= 4}
+    <button class="rota-btn" on:click={() => dispatch('rota')} in:fly={{ y: 50, duration: 400, easing: cubicOut }}>
+      <span class="cg-icon">📅</span>
+      <span class="cg-text">MY SHIFTS</span>
+      <span class="cg-subtitle">Rota & Scheduling</span>
+    </button>
+  {/if}
+
   <!-- Footer with slide-up animation -->
   {#if bootPhase >= 4}
     <footer class="footer" in:fly={{ y: 50, duration: 300, easing: cubicOut }}>
@@ -1347,6 +1356,45 @@
     .okap-games-btn {
       right: max(16px, env(safe-area-inset-right));
       bottom: calc(130px + env(safe-area-inset-bottom));
+      padding: 10px 14px;
+    }
+  }
+
+  /* Rota Management Button */
+  .rota-btn {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(60px + env(safe-area-inset-bottom));
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+  }
+  .rota-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.2) 100%);
+    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
+  }
+  .rota-btn .cg-text {
+    color: #f59e0b;
+  }
+  .rota-btn .cg-subtitle {
+    color: #fbbf24;
+  }
+  
+  @media (max-width: 768px) {
+    .rota-btn {
+      bottom: calc(200px + env(safe-area-inset-bottom));
       padding: 10px 14px;
     }
   }
