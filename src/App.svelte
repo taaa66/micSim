@@ -42,9 +42,19 @@
   import { RotaHub } from './modules/rota';
 
   // UI Components
-  import { ToastContainer } from './components/ui';
+  import { ToastContainer, AchievementPopup } from './components/ui';
   import { toasts } from './stores/toast';
   import SettingsModal from './components/SettingsModal.svelte';
+  
+  // Achievements
+  import { 
+    initAchievements, 
+    incrementProgress, 
+    getNextNotification,
+    checkTimeAchievements,
+    ACHIEVEMENTS
+  } from './stores/achievements';
+  import { celebrationBurst } from './lib/confetti';
   
   // Services
   import { initKeyboardShortcuts, registerDefaultShortcuts } from './lib/keyboardShortcuts';
@@ -62,11 +72,17 @@
   let cleanupShortcuts = null;
   let cleanupKeyboard = null;
   let settingsOpen = false;
+  let currentAchievement = null;
   
   // Initialize services on mount
   onMount(() => {
     initA11yPreferences();
+    initAchievements();
+    checkTimeAchievements();
     cleanupKeyboard = initKeyboardShortcuts();
+    
+    // Check for pending achievement notifications
+    checkPendingAchievements();
     
     // Register default shortcuts
     cleanupShortcuts = registerDefaultShortcuts({
@@ -88,6 +104,20 @@
     cleanupShortcuts?.();
     cleanupKeyboard?.();  
   });
+  
+  // Achievement notification system
+  function checkPendingAchievements() {
+    const next = getNextNotification();
+    if (next) {
+      currentAchievement = next;
+    }
+  }
+  
+  function handleAchievementClose() {
+    currentAchievement = null;
+    // Check for more pending
+    setTimeout(checkPendingAchievements, 500);
+  }
   
   function handleModuleHover(e) {
     if (e.detail) {
@@ -235,10 +265,28 @@
       // Show completion toast
       if (score >= 80) {
         toasts.success(`מעולה! השגת ${score} נקודות 🎯`);
+        celebrationBurst();
       } else if (score >= 60) {
         toasts.info(`סיימת עם ${score} נקודות. המשך להתאמן!`);
       } else {
         toasts.warning(`${score} נקודות. נסה שוב לשיפור!`);
+      }
+      
+      // Track achievements
+      const unlocked = incrementProgress('simulations_completed', 1);
+      if (score >= 90) {
+        incrementProgress('scores_above_90', 1);
+      }
+      if (score === 100) {
+        incrementProgress('max_score', 100);
+      }
+      if (duration < 30) {
+        incrementProgress('fastest_completion', 1);
+      }
+      
+      // Check for new achievements
+      if (unlocked.length > 0) {
+        setTimeout(checkPendingAchievements, 1000);
       }
     }
   }
@@ -258,6 +306,11 @@
       });
       
       toasts.success(`משחק הושלם! ${score} נקודות 🎮`);
+      celebrationBurst();
+      
+      // Track achievements
+      incrementProgress('games_won', 1);
+      setTimeout(checkPendingAchievements, 1000);
     }
   }
 
@@ -342,6 +395,18 @@
 
 <!-- Settings Modal -->
 <SettingsModal bind:open={settingsOpen} />
+
+<!-- Achievement Popup -->
+{#if currentAchievement}
+  <AchievementPopup
+    title={currentAchievement.titleHe}
+    description={currentAchievement.descriptionHe}
+    icon={currentAchievement.icon}
+    rarity={currentAchievement.rarity}
+    xp={currentAchievement.xp}
+    onClose={handleAchievementClose}
+  />
+{/if}
 
 <style>
   /* App container - full viewport */

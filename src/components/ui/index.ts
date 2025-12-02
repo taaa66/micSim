@@ -14,3 +14,7 @@ export { default as Modal } from './Modal.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
 export { default as Badge } from './Badge.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
+export { default as AchievementPopup } from './AchievementPopup.svelte';
+export { default as AnimatedCounter } from './AnimatedCounter.svelte';
+export { default as GlowButton } from './GlowButton.svelte';
+export { default as StatCard } from './StatCard.svelte';
