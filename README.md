@@ -552,33 +552,6 @@ A: LTI integration is on the roadmap for Q2 2025. Contact us for current integra
 **Q: What's the uptime SLA?**
 A: We target 99.9% availability. The platform can also function offline with sync on reconnection.
 
----
-
-## 🚀 Call to Action
-
-### If You're a Program Director
-
-Your residents deserve every advantage. Request a demo to see how OphthalmoSim+ can enhance your curriculum.
-
-📧 **clinical@ophthalmosim.com**
-
-### If You're a Resident
-
-Your career depends on skills you develop now. Ask your program director about OphthalmoSim+, or explore individual access options.
-
-📧 **residents@ophthalmosim.com**
-
-### If You're an Investor or Partner
-
-The future of surgical education is being built today. Let's discuss how we can work together.
-
-📧 **partnerships@ophthalmosim.com**
-
-### If You're a Developer
-
-We're building something meaningful. If you're passionate about healthcare, education, or high-performance applications, we'd love to hear from you.
-
-📧 **careers@ophthalmosim.com**
 
 ---
 
