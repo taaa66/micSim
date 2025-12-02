@@ -2,6 +2,7 @@
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import { currentModuleContext } from '../lib/contextStore.js';
   import { audio } from '../lib/audio.js';
+  import { ModernButton, GlassCard } from './ui';
   import TorqueGauge from './TorqueGauge.svelte';
   import OrganicBackground from './OrganicBackground.svelte';
   import ModuleIcons from './ModuleIcons.svelte';
@@ -323,72 +324,92 @@
   <!-- Detail Panel -->
   {#if selectedModule}
     <div class="overlay" transition:fade={{ duration: 150 }} on:click={closeDetail} on:keydown={(e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') closeDetail(); }} role="button" tabindex="0">
-      <div class="detail-panel" transition:fly={{ y: 30, duration: 200 }} on:click|stopPropagation on:keydown|stopPropagation role="dialog" tabindex="-1">
-        <button class="close-btn" on:click={closeDetail}>×</button>
-        <h2>{selectedModule.num}. {selectedModule.name}</h2>
-        <span class="detail-code">{selectedModule.code}</span>
-        <p class="detail-goal">{selectedModule.goal}</p>
-        
-        <div class="detail-stats">
-          <div class="stat-box"><span>MASTERY</span><strong>{selectedModule.mastery}%</strong></div>
-          <div class="stat-box"><span>STATUS</span><strong class={selectedModule.completed ? 'green' : 'amber'}>{selectedModule.completed ? 'COMPLETE' : 'IN PROGRESS'}</strong></div>
-          {#if selectedModule.rank}
-            <div class="stat-box rank"><span>RANK</span><strong class:core={selectedModule.rank <= 5}>#{selectedModule.rank}</strong></div>
-          {/if}
-        </div>
-        
-        <!-- Research-Based Metadata -->
-        {#if selectedModule.pgyStage || selectedModule.difficulty}
-          <div class="detail-meta">
-            {#if selectedModule.pgyStage}
-              <span class="meta-badge pgy">{selectedModule.pgyStage}</span>
-            {/if}
-            {#if selectedModule.difficulty}
-              <span class="meta-badge difficulty" class:critical={selectedModule.difficulty === 'CRITICAL'}>
-                {selectedModule.difficulty}
-              </span>
-            {/if}
+      <div class="detail-wrapper" transition:fly={{ y: 30, duration: 200 }} on:click|stopPropagation on:keydown|stopPropagation role="dialog" tabindex="-1">
+        <GlassCard variant="dark" padding="lg" className="detail-card">
+          <button class="close-btn" on:click={closeDetail}>×</button>
+          
+          <div class="detail-header">
+            <span class="detail-code">{selectedModule.code}</span>
+            <h2 class="detail-title">{selectedModule.num}. {selectedModule.name}</h2>
+            <p class="detail-goal">{selectedModule.goal}</p>
           </div>
-        {/if}
-        
-        {#if selectedModule.hapticNote}
-          <div class="haptic-note">
-            <span class="note-icon">ℹ️</span>
-            <span class="note-text">{selectedModule.hapticNote}</span>
-          </div>
-        {/if}
+          
+          <div class="detail-content">
+            <div class="detail-stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">MASTERY</span>
+                <strong class="stat-value">{selectedModule.mastery}%</strong>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">STATUS</span>
+                <strong class="stat-value" class:complete={selectedModule.completed} class:pending={!selectedModule.completed}>
+                  {selectedModule.completed ? 'COMPLETE' : 'IN PROGRESS'}
+                </strong>
+              </div>
+              {#if selectedModule.rank}
+                <div class="stat-item">
+                  <span class="stat-label">RANK</span>
+                  <strong class="stat-value rank" class:core={selectedModule.rank <= 5}>#{selectedModule.rank}</strong>
+                </div>
+              {/if}
+            </div>
 
-        {#if selectedModule.id === 'capsulorhexis'}
-          <div class="detail-section">
-            <h4>TENSION DELTA</h4>
-            <div class="tension-gauge" style="--v:{tensionRate}">
-              <svg viewBox="0 0 60 60">
-                <defs>
-                  <linearGradient id="tdg" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#0fb89f" />
-                    <stop offset="100%" stop-color="#f59e0b" />
-                  </linearGradient>
-                </defs>
-                <circle cx="30" cy="30" r="24" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none"/>
-                <circle class="td-fill" cx="30" cy="30" r="24" stroke="url(#tdg)" stroke-width="6" fill="none"
-                  stroke-linecap="round" stroke-dasharray="151" stroke-dashoffset="calc(151 - (var(--v) * 1.51))" transform="rotate(-90 30 30)"/>
-              </svg>
-              <span class="td-label">{Math.round(tensionRate)}%</span>
+            <!-- Metadata Tags -->
+            <div class="meta-tags">
+              {#if selectedModule.pgyStage}
+                <span class="meta-badge pgy">{selectedModule.pgyStage}</span>
+              {/if}
+              {#if selectedModule.difficulty}
+                <span class="meta-badge difficulty" class:critical={selectedModule.difficulty === 'CRITICAL'}>
+                  {selectedModule.difficulty}
+                </span>
+              {/if}
+            </div>
+
+            {#if selectedModule.hapticNote}
+              <div class="haptic-note">
+                <UIIcons icon="info" size={16} color="var(--color-teal-400)" />
+                <span class="note-text">{selectedModule.hapticNote}</span>
+              </div>
+            {/if}
+
+            {#if selectedModule.id === 'capsulorhexis'}
+              <div class="detail-section tension-section">
+                <h4>TENSION DELTA</h4>
+                <div class="tension-gauge" style="--v:{tensionRate}">
+                  <svg viewBox="0 0 60 60">
+                    <defs>
+                      <linearGradient id="tdg" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#0fb89f" />
+                        <stop offset="100%" stop-color="#f59e0b" />
+                      </linearGradient>
+                    </defs>
+                    <circle cx="30" cy="30" r="24" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none"/>
+                    <circle class="td-fill" cx="30" cy="30" r="24" stroke="url(#tdg)" stroke-width="6" fill="none"
+                      stroke-linecap="round" stroke-dasharray="151" stroke-dashoffset="calc(151 - (var(--v) * 1.51))" transform="rotate(-90 30 30)"/>
+                  </svg>
+                  <span class="td-label">{Math.round(tensionRate)}%</span>
+                </div>
+              </div>
+            {/if}
+
+            <div class="detail-section">
+              <h4>SKILLS TRAINED</h4>
+              <div class="tags">{#each selectedModule.skills as s}<span class="tag">{s}</span>{/each}</div>
+            </div>
+
+            <div class="detail-section risk">
+              <h4>RISK MITIGATION</h4>
+              <ul>{#each selectedModule.prevents as p}<li>⚠ {p}</li>{/each}</ul>
             </div>
           </div>
-        {/if}
 
-        <div class="detail-section">
-          <h4>SKILLS TRAINED</h4>
-          <div class="tags">{#each selectedModule.skills as s}<span class="tag">{s}</span>{/each}</div>
-        </div>
-
-        <div class="detail-section risk">
-          <h4>RISK MITIGATION</h4>
-          <ul>{#each selectedModule.prevents as p}<li>⚠ {p}</li>{/each}</ul>
-        </div>
-
-        <button class="launch-btn" on:click={launchModule}>▶ LAUNCH MODULE</button>
+          <div class="detail-actions">
+            <ModernButton variant="primary" size="lg" fullWidth on:click={launchModule}>
+              ▶ LAUNCH MODULE
+            </ModernButton>
+          </div>
+        </GlassCard>
       </div>
     </div>
   {/if}
@@ -396,32 +417,38 @@
   <!-- Quick Access Cards - 2028 Design -->
   {#if bootPhase >= 4}
     <div class="quick-access-panel" in:fly={{ y: 30, duration: 500, easing: cubicOut }}>
-      <button class="quick-card" on:click={() => dispatch('coreGames')}>
-        <div class="quick-icon games">🎮</div>
-        <div class="quick-content">
-          <span class="quick-title">Core Games</span>
-          <span class="quick-desc">Motor Skills Training</span>
+      <GlassCard hoverEffect padding="sm" className="quick-card-glass" on:click={() => dispatch('coreGames')}>
+        <div class="quick-inner">
+          <div class="quick-icon games">🎮</div>
+          <div class="quick-content">
+            <span class="quick-title">Core Games</span>
+            <span class="quick-desc">Motor Skills Training</span>
+          </div>
+          <span class="quick-arrow">→</span>
         </div>
-        <span class="quick-arrow">→</span>
-      </button>
+      </GlassCard>
       
-      <button class="quick-card" on:click={() => dispatch('okapGames')}>
-        <div class="quick-icon okap">📚</div>
-        <div class="quick-content">
-          <span class="quick-title">OKAP Prep</span>
-          <span class="quick-desc">Knowledge Assessment</span>
+      <GlassCard hoverEffect padding="sm" className="quick-card-glass" on:click={() => dispatch('okapGames')}>
+        <div class="quick-inner">
+          <div class="quick-icon okap">📚</div>
+          <div class="quick-content">
+            <span class="quick-title">OKAP Prep</span>
+            <span class="quick-desc">Knowledge Assessment</span>
+          </div>
+          <span class="quick-arrow">→</span>
         </div>
-        <span class="quick-arrow">→</span>
-      </button>
+      </GlassCard>
       
-      <button class="quick-card" on:click={() => dispatch('rota')}>
-        <div class="quick-icon rota">📅</div>
-        <div class="quick-content">
-          <span class="quick-title">My Schedule</span>
-          <span class="quick-desc">Shifts & Planning</span>
+      <GlassCard hoverEffect padding="sm" className="quick-card-glass" on:click={() => dispatch('rota')}>
+        <div class="quick-inner">
+          <div class="quick-icon rota">📅</div>
+          <div class="quick-content">
+            <span class="quick-title">My Schedule</span>
+            <span class="quick-desc">Shifts & Planning</span>
+          </div>
+          <span class="quick-arrow">→</span>
         </div>
-        <span class="quick-arrow">→</span>
-      </button>
+      </GlassCard>
     </div>
   {/if}
 
@@ -772,64 +799,112 @@
     height: clamp(60px, 15vw, 100px);
     z-index: 5;
   }
+  /* Modern Eye Design (2028) */
   .eye-outer {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--bg-elevated) 0%, var(--bg-space) 100%);
-    border: 2px solid var(--cyan-400);
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(20, 184, 166, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 40px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1);
+    box-shadow: 
+      0 0 60px rgba(20, 184, 166, 0.2),
+      inset 0 0 30px rgba(20, 184, 166, 0.1);
     position: relative;
-    animation: eyePulse 3s ease-in-out infinite;
+    backdrop-filter: blur(8px);
+    animation: eyePulse 4s ease-in-out infinite;
   }
+
   .eye-burst {
     position: absolute;
     inset: -10px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(52,211,153,0.35) 0%, rgba(52,211,153,0.0) 60%);
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.4) 0%, transparent 70%);
     filter: blur(4px);
     animation: eyeBurst 0.6s ease-out forwards;
   }
+
   @keyframes eyeBurst {
     0% { opacity: 0; transform: scale(0.7); }
     50% { opacity: 1; transform: scale(1.1); }
     100% { opacity: 0; transform: scale(1.3); }
   }
+
   @keyframes eyePulse {
-    0%, 100% { box-shadow: 0 0 40px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); }
-    50% { box-shadow: 0 0 60px rgba(0,255,255,0.5), inset 0 0 30px rgba(0,255,255,0.15); }
+    0%, 100% { box-shadow: 0 0 50px rgba(20, 184, 166, 0.2), inset 0 0 20px rgba(20, 184, 166, 0.1); border-color: rgba(20, 184, 166, 0.4); }
+    50% { box-shadow: 0 0 80px rgba(20, 184, 166, 0.4), inset 0 0 40px rgba(20, 184, 166, 0.2); border-color: rgba(20, 184, 166, 0.8); }
   }
+
   .eye-glow {
     position: absolute;
-    inset: -20px;
-    background: radial-gradient(circle, rgba(0,255,255,0.2) 0%, transparent 70%);
+    inset: -40px;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 60%);
     border-radius: 50%;
-    animation: glowPulse 2s ease-in-out infinite;
+    filter: blur(20px);
+    animation: glowPulse 3s ease-in-out infinite;
   }
+
   @keyframes glowPulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.15); opacity: 0.7; }
   }
+
   .iris {
-    width: 55%;
-    height: 55%;
+    width: 60%;
+    height: 60%;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--cyan-800) 0%, var(--cyan-900) 100%);
+    background: conic-gradient(
+      from 0deg,
+      var(--color-teal-500) 0%,
+      var(--color-teal-600) 50%,
+      var(--color-teal-400) 100%
+    );
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 0 15px rgba(0,255,255,0.3);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative;
   }
+  
+  /* Iris Detail - Organic Lines */
+  .iris::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+      rgba(0,0,0,0.1) 0deg,
+      rgba(0,0,0,0.1) 2deg,
+      transparent 2deg,
+      transparent 4deg
+    );
+    mix-blend-mode: overlay;
+  }
+
   .pupil {
-    width: 50%;
-    height: 50%;
-    background: #000;
+    width: 45%;
+    height: 45%;
+    background: #020617;
     border-radius: 50%;
     position: relative;
-    transition: transform 0.3s ease;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    z-index: 2;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .pupil::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 25%;
+    width: 20%;
+    height: 20%;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.6;
+    filter: blur(1px);
   }
   .pupil.active {
     transform: scale(1.15);
@@ -1024,201 +1099,234 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     padding: 20px;
+    animation: fadeIn 0.2s ease-out;
   }
-  .detail-panel {
+
+  .detail-wrapper {
     width: 100%;
-    max-width: 400px;
-    background: var(--bg2);
-    border: 1px solid var(--accent);
-    border-radius: 12px;
-    padding: 24px;
-    position: relative;
-    box-shadow: 0 0 60px rgba(52,211,153,0.2);
+    max-width: 440px;
+    perspective: 1000px;
   }
+
+  /* Target the GlassCard component inside detail-wrapper */
+  :global(.detail-card) {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid rgba(20, 184, 166, 0.2) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(20, 184, 166, 0.15) !important;
+  }
+
   .close-btn {
     position: absolute;
-    top: 12px;
+    top: 16px;
     right: 16px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 24px;
-    cursor: pointer;
-    line-height: 1;
-    min-width: 44px;
-    min-height: 44px;
-  }
-  .detail-panel h2 {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     font-size: 18px;
-    margin: 0 0 4px;
-    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
   }
+
+  .close-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .detail-header {
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
   .detail-code {
     display: inline-block;
+    font-family: var(--font-mono);
     font-size: 10px;
-    background: var(--accent);
-    color: var(--bg);
-    padding: 3px 10px;
+    color: var(--color-teal-400);
+    background: rgba(20, 184, 166, 0.1);
+    padding: 4px 8px;
     border-radius: 4px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  .detail-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 0 8px;
     font-weight: 700;
+    letter-spacing: -0.01em;
   }
+
   .detail-goal {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin: 16px 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
   }
-  .detail-stats {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
+
+  .detail-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
   }
-  .stat-box {
-    flex: 1;
-    background: rgba(255,255,255,0.03);
-    padding: 12px;
-    border-radius: 8px;
+
+  .stat-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px;
+    border-radius: 10px;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
-  .stat-box span {
+
+  .stat-label {
     display: block;
     font-size: 9px;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.5);
     margin-bottom: 4px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
   }
-  .stat-box strong {
-    font-size: 16px;
-    color: var(--accent-bright);
+
+  .stat-value {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    font-family: var(--font-mono);
   }
-  .stat-box strong.amber { color: #f59e0b; }
-  .stat-box strong.green { color: var(--accent-bright); }
-  .stat-box.rank strong { color: #fbbf24; }
-  .stat-box.rank strong.core { color: #34d399; font-weight: 800; }
-  
-  /* Research metadata badges */
-  .detail-meta {
+
+  .stat-value.complete { color: var(--color-teal-400); text-shadow: 0 0 10px rgba(20, 184, 166, 0.3); }
+  .stat-value.pending { color: #fbbf24; }
+  .stat-value.rank.core { color: #34d399; }
+
+  /* Meta badges styling */
+  .meta-tags {
     display: flex;
     gap: 8px;
-    margin: 12px 0 16px;
-    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
   }
+  
   .meta-badge {
-    font-size: 10px;
-    padding: 4px 10px;
+    font-size: 9px;
+    padding: 4px 8px;
     border-radius: 6px;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }
+  
   .meta-badge.pgy {
-    background: rgba(59, 130, 246, 0.15);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    color: #60a5fa;
-  }
-  .meta-badge.difficulty {
-    background: rgba(245, 158, 11, 0.15);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    color: #fbbf24;
-  }
-  .meta-badge.difficulty.critical {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
   }
   
-  /* Haptic limitation note */
+  .meta-badge.difficulty {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+  }
+  
+  .meta-badge.difficulty.critical {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+  }
+
+  /* Haptic Note */
   .haptic-note {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    padding: 10px 12px;
-    background: rgba(59, 130, 246, 0.1);
-    border-left: 3px solid #3b82f6;
-    border-radius: 6px;
-    margin-bottom: 16px;
-  }
-  .note-icon {
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-  .note-text {
-    font-size: 11px;
-    color: #93c5fd;
-    line-height: 1.4;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(20, 184, 166, 0.05);
+    border: 1px solid rgba(20, 184, 166, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
   }
   
+  .note-text {
+    font-size: 11px;
+    color: var(--color-teal-100);
+    line-height: 1.4;
+  }
+
   .detail-section { margin-bottom: 16px; }
-  /* V12 Tension Delta gauge */
-  .tension-gauge { display:flex; align-items:center; gap:10px; }
-  .tension-gauge svg { width:56px; height:56px; filter: drop-shadow(0 0 6px rgba(255,255,255,0.05)); }
-  .td-label { font-weight:700; color:#fbbf24; }
+  
   .detail-section h4 {
     font-size: 10px;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.5);
     letter-spacing: 1px;
     margin: 0 0 8px;
+    font-weight: 600;
   }
+
+  /* Tension Gauge */
+  .tension-gauge { display:flex; align-items:center; gap:12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; }
+  .tension-gauge svg { width:48px; height:48px; }
+  .td-label { font-weight:700; color:#fbbf24; font-family: var(--font-mono); font-size: 1.1rem; }
+
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  
   .tag {
-    font-size: 11px;
-    padding: 5px 12px;
-    background: rgba(52,211,153,0.15);
-    border: 1px solid rgba(52,211,153,0.3);
-    border-radius: 16px;
-    color: var(--accent-bright);
+    font-size: 10px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.8);
   }
-  .detail-section.risk h4 { color: #f59e0b; }
+
   .detail-section.risk ul {
     list-style: none;
     margin: 0;
     padding: 0;
   }
+  
   .detail-section.risk li {
-    font-size: 12px;
+    font-size: 11px;
     color: #fca5a5;
-    padding: 8px 12px;
-    background: rgba(248,113,113,0.08);
-    border: 1px solid rgba(248,113,113,0.15);
+    padding: 6px 10px;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.1);
     border-radius: 6px;
     margin-bottom: 4px;
   }
-  .launch-btn {
-    width: 100%;
-    padding: var(--space-4) var(--space-6);
-    background: var(--gradient-primary);
-    border: none;
-    border-radius: var(--radius-md);
-    color: var(--neutral-950);
-    font-family: var(--font-primary);
-    font-weight: var(--font-semibold);
-    font-size: var(--text-base);
-    letter-spacing: var(--tracking-wide);
+
+  /* Quick Access Glass Styles */
+  :global(.quick-card-glass) {
+    flex: 1;
     cursor: pointer;
-    min-height: 48px;
-    transition: all var(--duration-base) var(--ease-in-out);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 
-      0 4px 12px rgba(52,211,153,0.25),
-      inset 0 1px 0 rgba(255,255,255,0.2);
+    min-width: 120px;
+    transition: all 0.3s ease;
   }
-  .launch-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-    transform: translateX(-100%);
-    animation: btnShine 3s ease-in-out infinite;
-  }
-  @keyframes btnShine {
-    0%, 100% { transform: translateX(-100%); }
-    50% { transform: translateX(100%); }
+
+  .quick-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
   }
   .launch-btn:hover {
     transform: translateY(-1px);
@@ -1377,91 +1485,75 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 12px;
+    gap: 16px;
     z-index: 50;
-    padding: 8px;
-    background: rgba(18, 22, 29, 0.9);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  }
-  
-  .quick-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 160px;
-  }
-  
-  .quick-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
+    padding: 0;
   }
   
   .quick-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   
   .quick-icon.games {
     background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(6, 182, 212, 0.1));
     border: 1px solid rgba(20, 184, 166, 0.3);
+    color: #2dd4bf;
   }
   
   .quick-icon.okap {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1));
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.1));
     border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
   }
   
   .quick-icon.rota {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1));
     border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+  }
+
+  :global(.quick-card-glass:hover) .quick-icon {
+    transform: scale(1.1) rotate(5deg);
   }
   
   .quick-content {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    text-align: left;
+    flex: 1;
   }
   
   .quick-title {
+    color: white;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #FFFFFF;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.3px;
   }
   
   .quick-desc {
-    font-size: 0.7rem;
-    color: var(--text-muted, #8B9AAB);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.5);
     font-weight: 500;
   }
   
   .quick-arrow {
     font-size: 1rem;
-    color: var(--text-muted, #8B9AAB);
+    color: rgba(255, 255, 255, 0.3);
     margin-left: auto;
-    transition: transform 0.2s;
+    transition: transform 0.3s, color 0.3s;
   }
   
-  .quick-card:hover .quick-arrow {
+  :global(.quick-card-glass:hover) .quick-arrow {
     transform: translateX(4px);
-    color: var(--primary-400, #26D4C4);
+    color: var(--color-teal-400);
   }
   
   @media (max-width: 768px) {

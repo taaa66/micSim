@@ -22,3 +22,4 @@ export { default as LevelUpPopup } from './LevelUpPopup.svelte';
 export { default as StreakBadge } from './StreakBadge.svelte';
 export { default as XPBar } from './XPBar.svelte';
 export { default as ModernButton } from './ModernButton.svelte';
+export { default as GlassCard } from './GlassCard.svelte';
