@@ -7,7 +7,7 @@
 -->
 
 <script lang="ts">
-  import { Modal } from './ui';
+  import { Modal, ModernButton } from './ui';
   import { a11yPreferences, saveA11yPreferences } from '../lib/accessibility';
   import { toasts } from '../stores/toast';
   import { downloadUserData, downloadUserDataCSV } from '../lib/dataExport';
@@ -91,12 +91,12 @@
       </p>
       
       <div class="export-buttons">
-        <button class="btn-export" on:click={handleExportJSON}>
-          📄 ייצוא JSON
-        </button>
-        <button class="btn-export" on:click={handleExportCSV}>
-          📊 ייצוא CSV
-        </button>
+        <ModernButton variant="secondary" size="sm" fullWidth on:click={handleExportJSON} icon="📄">
+          ייצוא JSON
+        </ModernButton>
+        <ModernButton variant="secondary" size="sm" fullWidth on:click={handleExportCSV} icon="📊">
+          ייצוא CSV
+        </ModernButton>
       </div>
     </section>
     
@@ -121,8 +121,8 @@
   </div>
   
   <svelte:fragment slot="footer">
-    <button class="btn-cancel" on:click={() => open = false}>ביטול</button>
-    <button class="btn-save" on:click={handleSave}>שמור</button>
+    <ModernButton variant="ghost" on:click={() => open = false}>ביטול</ModernButton>
+    <ModernButton variant="primary" on:click={handleSave}>שמור שינויים</ModernButton>
   </svelte:fragment>
 </Modal>
 
@@ -222,23 +222,6 @@
     gap: 12px;
   }
   
-  .btn-export {
-    flex: 1;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-  }
-  
-  .btn-export:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-  
   .shortcuts-list {
     display: flex;
     flex-direction: column;
@@ -267,34 +250,5 @@
   .shortcut span {
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.85rem;
-  }
-  
-  .btn-cancel, .btn-save {
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .btn-cancel {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  .btn-cancel:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  
-  .btn-save {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    border: none;
-    color: white;
-  }
-  
-  .btn-save:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   }
 </style>
