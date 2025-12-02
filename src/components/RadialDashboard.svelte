@@ -192,23 +192,30 @@
   <!-- Organic Background Layer -->
   <OrganicBackground />
   
-  <!-- Header -->
+  <!-- Header - 2028 Professional Design -->
   <header class="header" class:visible={bootPhase >= 1}>
     <div class="header-left">
-      <UIIcons icon="eye" size={24} color="var(--cyan-400)" />
+      <div class="brand-logo">
+        <UIIcons icon="eye" size={28} color="var(--primary-400)" />
+        <span class="brand-mark">OS+</span>
+      </div>
     </div>
     <div class="header-center">
-      <h1 class="scanline-text">
-        <UIIcons icon="target" size={16} color="var(--cyan-400)" />
-        OPHTHALMIC SURGICAL SIMULATOR
+      <h1 class="brand-title">
+        OphthalmoSim<span class="brand-plus">+</span>
       </h1>
-      <p>
-        <UIIcons icon="activity" size={12} color="var(--cyan-400)" />
-        INTELLIGENT SURGICAL DASHBOARD • V7.0
+      <p class="brand-tagline">
+        Surgical Training Platform
       </p>
     </div>
     <div class="header-right">
-      <UIIcons icon="user" size={20} color="var(--cyan-400)" />
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Online</span>
+      </div>
+      <button class="header-avatar">
+        <UIIcons icon="user" size={18} color="var(--neutral-100)" />
+      </button>
     </div>
 
   {#if traceActive}
@@ -386,31 +393,36 @@
     </div>
   {/if}
 
-  <!-- Core Games Button -->
+  <!-- Quick Access Cards - 2028 Design -->
   {#if bootPhase >= 4}
-    <button class="core-games-btn" on:click={() => dispatch('coreGames')} in:fly={{ x: -50, duration: 400, easing: cubicOut }}>
-      <span class="cg-icon">🎮</span>
-      <span class="cg-text">CORE GAMES</span>
-      <span class="cg-subtitle">Motor Training</span>
-    </button>
-  {/if}
-
-  <!-- OKAP Knowledge Games Button -->
-  {#if bootPhase >= 4}
-    <button class="okap-games-btn" on:click={() => dispatch('okapGames')} in:fly={{ x: 50, duration: 400, easing: cubicOut }}>
-      <span class="cg-icon">📚</span>
-      <span class="cg-text">OKAP PREP</span>
-      <span class="cg-subtitle">Knowledge Games</span>
-    </button>
-  {/if}
-
-  <!-- Rota Management Button -->
-  {#if bootPhase >= 4}
-    <button class="rota-btn" on:click={() => dispatch('rota')} in:fly={{ y: 50, duration: 400, easing: cubicOut }}>
-      <span class="cg-icon">📅</span>
-      <span class="cg-text">MY SHIFTS</span>
-      <span class="cg-subtitle">Rota & Scheduling</span>
-    </button>
+    <div class="quick-access-panel" in:fly={{ y: 30, duration: 500, easing: cubicOut }}>
+      <button class="quick-card" on:click={() => dispatch('coreGames')}>
+        <div class="quick-icon games">🎮</div>
+        <div class="quick-content">
+          <span class="quick-title">Core Games</span>
+          <span class="quick-desc">Motor Skills Training</span>
+        </div>
+        <span class="quick-arrow">→</span>
+      </button>
+      
+      <button class="quick-card" on:click={() => dispatch('okapGames')}>
+        <div class="quick-icon okap">📚</div>
+        <div class="quick-content">
+          <span class="quick-title">OKAP Prep</span>
+          <span class="quick-desc">Knowledge Assessment</span>
+        </div>
+        <span class="quick-arrow">→</span>
+      </button>
+      
+      <button class="quick-card" on:click={() => dispatch('rota')}>
+        <div class="quick-icon rota">📅</div>
+        <div class="quick-content">
+          <span class="quick-title">My Schedule</span>
+          <span class="quick-desc">Shifts & Planning</span>
+        </div>
+        <span class="quick-arrow">→</span>
+      </button>
+    </div>
   {/if}
 
   <!-- Footer with slide-up animation -->
@@ -439,48 +451,48 @@
 
 <style>
   .dashboard {
-    --bg: #040d10;
-    --bg2: #0a1a1f;
-    --accent: #0fb89f;
-    --accent-bright: #34d399;
-    --text: #ffffff;
-    --text-muted: #7aa8a0;
-    --gold: #d4a853;
-    --card-size: min(115px, 15vw); /* Slightly larger cards */
-    --radius: min(36vw, 36vh, 300px); /* Expanded radius for breathing room */
+    /* 2028 Professional Design Variables */
+    --bg: var(--bg-space, #0C0F14);
+    --bg2: var(--bg-panel, #12161D);
+    --accent: var(--primary-500, #14B8A6);
+    --accent-bright: var(--primary-400, #26D4C4);
+    --text: #FFFFFF;
+    --text-muted: #8B9AAB;
+    --gold: #F59E0B;
+    --card-size: min(100px, 14vw);
+    --radius: min(34vw, 34vh, 280px);
     
     width: 100%;
     height: 100vh;
     height: 100dvh;
-    background: var(--bg);
+    background: linear-gradient(180deg, var(--bg) 0%, #080A0E 100%);
     color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-primary, 'Inter', -apple-system, sans-serif);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: clamp(12px, 2vmin, 24px);
-    padding-bottom: calc(env(safe-area-inset-bottom) + clamp(12px, 2vmin, 24px));
+    padding: clamp(16px, 3vmin, 28px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + clamp(16px, 3vmin, 28px));
   }
   .dashboard.booting {
     background: #000;
   }
 
-  /* === HEADER with glass morphism === */
+  /* === 2028 PROFESSIONAL HEADER === */
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-2) var(--space-4);
-    background: rgba(10, 26, 31, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(52,211,153,0.12);
-    box-shadow: 
-      0 1px 0 rgba(52,211,153,0.08),
-      0 4px 12px rgba(0,0,0,0.08);
+    padding: 12px 20px;
+    background: rgba(18, 22, 29, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    margin-bottom: 16px;
     z-index: 10;
     opacity: 0;
     transform: translateY(-10px);
-    transition: all var(--duration-slow) var(--ease-out);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .header.visible {
     opacity: 1;
@@ -490,13 +502,21 @@
   .header-left, .header-right {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
+    gap: 12px;
   }
   
-  .header-left:hover, .header-right:hover {
-    opacity: 1;
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .brand-mark {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-400, #26D4C4);
+    letter-spacing: -0.02em;
   }
   
   .header-center { 
@@ -504,53 +524,81 @@
     flex: 1;
   }
   
-  .header h1 {
-    font-family: var(--font-display);
-    font-size: clamp(10px, 2.5vw, 16px);
-    font-weight: var(--font-bold);
-    letter-spacing: var(--tracking-wide);
+  .brand-title {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
     margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
+    color: #FFFFFF;
   }
   
-  .header p {
+  .brand-plus {
+    color: var(--primary-400, #26D4C4);
+    font-weight: 700;
+  }
+  
+  .brand-tagline {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted, #8B9AAB);
+    margin: 2px 0 0;
+    letter-spacing: 0.02em;
+  }
+  
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    border-radius: 20px;
+  }
+  
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background: #10B981;
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  
+  .status-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #10B981;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .header-avatar {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  .scanline-text {
-    animation: scanline 0.8s var(--ease-out) forwards;
-    background: linear-gradient(90deg, 
-      var(--primary-300) 0%, 
-      var(--primary-400) 50%, 
-      var(--primary-300) 100%);
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 8px rgba(52,211,153,0.2);
+  
+  .header-avatar:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
   }
-  @keyframes scanline {
-    0% { background-position: 200% 0; opacity: 0; }
-    50% { opacity: 1; }
-    100% { background-position: 0% 0; opacity: 1; }
-  }
-  .header p {
-    font-family: var(--font-mono);
-    font-size: clamp(7px, 1.5vw, 9px);
-    font-weight: var(--font-medium);
-    letter-spacing: var(--tracking-wider);
-    color: var(--text-muted);
-    margin: var(--space-1) 0 0;
-  }
+  
   .session-id {
-    font-size: clamp(6px, 1.2vw, 8px);
-    font-family: monospace;
-    color: rgba(122, 168, 160, 0.4);
+    font-size: 0.65rem;
+    font-family: var(--font-mono, monospace);
+    color: rgba(139, 154, 171, 0.4);
   }
 
   /* === MAIN CONTAINER === */
@@ -1272,130 +1320,111 @@
   }
   .trace-line.active { stroke-dashoffset: 0; }
 
-  /* Core Games Button */
-  .core-games-btn {
+  /* === 2028 QUICK ACCESS PANEL === */
+  .quick-access-panel {
     position: fixed;
-    left: max(16px, env(safe-area-inset-left));
-    bottom: calc(60px + env(safe-area-inset-bottom));
-    background: linear-gradient(135deg, rgba(15, 184, 159, 0.15) 0%, rgba(52, 211, 153, 0.1) 100%);
-    border: 1px solid rgba(52, 211, 153, 0.4);
-    border-radius: 12px;
-    padding: 12px 16px;
-    cursor: pointer;
-    z-index: 50;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 0 20px rgba(52, 211, 153, 0.1);
-  }
-  .core-games-btn:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, rgba(15, 184, 159, 0.25) 0%, rgba(52, 211, 153, 0.2) 100%);
-    border-color: rgba(52, 211, 153, 0.6);
-    box-shadow: 0 0 30px rgba(52, 211, 153, 0.25);
-  }
-  .cg-icon {
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-  .cg-text {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--accent-bright);
-  }
-  .cg-subtitle {
-    font-size: 0.5rem;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
-  }
-  
-  @media (max-width: 768px) {
-    .core-games-btn {
-      left: auto;
-      right: max(16px, env(safe-area-inset-right));
-      bottom: calc(70px + env(safe-area-inset-bottom));
-      padding: 10px 14px;
-    }
-    .cg-icon {
-      font-size: 1.3rem;
-    }
-  }
-
-  /* OKAP Games Button */
-  .okap-games-btn {
-    position: fixed;
-    right: max(16px, env(safe-area-inset-right));
-    bottom: calc(60px + env(safe-area-inset-bottom));
-    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
-    border: 1px solid rgba(168, 85, 247, 0.4);
-    border-radius: 12px;
-    padding: 12px 16px;
-    cursor: pointer;
-    z-index: 50;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
-  }
-  .okap-games-btn:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, rgba(96, 165, 250, 0.25) 0%, rgba(168, 85, 247, 0.2) 100%);
-    border-color: rgba(168, 85, 247, 0.6);
-    box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
-  }
-  .okap-games-btn .cg-text {
-    color: #a855f7;
-  }
-  
-  @media (max-width: 768px) {
-    .okap-games-btn {
-      right: max(16px, env(safe-area-inset-right));
-      bottom: calc(130px + env(safe-area-inset-bottom));
-      padding: 10px 14px;
-    }
-  }
-
-  /* Rota Management Button */
-  .rota-btn {
-    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
-    bottom: calc(60px + env(safe-area-inset-bottom));
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.4);
-    border-radius: 12px;
-    padding: 12px 20px;
-    cursor: pointer;
+    display: flex;
+    gap: 12px;
     z-index: 50;
+    padding: 8px;
+    background: rgba(18, 22, 29, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  
+  .quick-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+  }
+  
+  .quick-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+  }
+  
+  .quick-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  
+  .quick-icon.games {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(6, 182, 212, 0.1));
+    border: 1px solid rgba(20, 184, 166, 0.3);
+  }
+  
+  .quick-icon.okap {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+  }
+  
+  .quick-icon.rota {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  
+  .quick-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+    gap: 2px;
+    text-align: left;
   }
-  .rota-btn:hover {
-    transform: translateX(-50%) scale(1.05);
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.2) 100%);
-    border-color: rgba(245, 158, 11, 0.6);
-    box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
+  
+  .quick-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    letter-spacing: -0.01em;
   }
-  .rota-btn .cg-text {
-    color: #f59e0b;
+  
+  .quick-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted, #8B9AAB);
+    font-weight: 500;
   }
-  .rota-btn .cg-subtitle {
-    color: #fbbf24;
+  
+  .quick-arrow {
+    font-size: 1rem;
+    color: var(--text-muted, #8B9AAB);
+    margin-left: auto;
+    transition: transform 0.2s;
+  }
+  
+  .quick-card:hover .quick-arrow {
+    transform: translateX(4px);
+    color: var(--primary-400, #26D4C4);
   }
   
   @media (max-width: 768px) {
-    .rota-btn {
-      bottom: calc(200px + env(safe-area-inset-bottom));
-      padding: 10px 14px;
+    .quick-access-panel {
+      flex-direction: column;
+      width: calc(100% - 32px);
+      max-width: 320px;
+      bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+    
+    .quick-card {
+      min-width: auto;
+      width: 100%;
     }
   }
-</style>
+  </style>

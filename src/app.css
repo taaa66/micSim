@@ -8,13 +8,13 @@
  * =============================================================================
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* ===== FUTURISTIC TYPOGRAPHY SYSTEM ===== */
-  --font-primary: 'Rajdhani', 'Orbitron', monospace, sans-serif;
-  --font-display: 'Orbitron', sans-serif;
-  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  /* ===== 2028 PROFESSIONAL TYPOGRAPHY SYSTEM ===== */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
   
   /* Font Weights */
   --font-light: 300;
@@ -37,24 +37,37 @@
   --leading-normal: 1.5;
   --leading-relaxed: 1.75;
   
-  /* ===== FUTURISTIC COLOR PALETTE (Cyan Glow) ===== */
-  /* Primary Cyan */
-  --cyan-50: #E0FFFF;
-  --cyan-100: #B3FFFF;
-  --cyan-200: #80FFFF;
-  --cyan-300: #4DFFFF;
-  --cyan-400: #00FFFF;  /* Primary accent */
-  --cyan-500: #00D9FF;  /* Main brand */
-  --cyan-600: #00B8E6;
-  --cyan-700: #0097CC;
-  --cyan-800: #007699;
-  --cyan-900: #005566;
+  /* ===== 2028 MEDICAL PROFESSIONAL COLOR PALETTE ===== */
+  /* Primary Teal (Medical Trust) */
+  --primary-50: #E6FAF8;
+  --primary-100: #B3F0EA;
+  --primary-200: #80E6DC;
+  --primary-300: #4DDCCE;
+  --primary-400: #26D4C4;  /* Primary accent */
+  --primary-500: #14B8A6;  /* Main brand - Teal */
+  --primary-600: #0D9488;
+  --primary-700: #0F766E;
+  --primary-800: #115E59;
+  --primary-900: #134E4A;
   
-  /* Background (Deep Space) */
-  --bg-space: #0A0E14;      /* Main background */
-  --bg-panel: #0F1419;      /* Card background */
-  --bg-elevated: #141A21;   /* Elevated elements */
-  --bg-overlay: rgba(10, 14, 20, 0.95);
+  /* Cyan accent (kept for animations) */
+  --cyan-50: #ECFEFF;
+  --cyan-100: #CFFAFE;
+  --cyan-200: #A5F3FC;
+  --cyan-300: #67E8F9;
+  --cyan-400: #22D3EE;
+  --cyan-500: #06B6D4;
+  --cyan-600: #0891B2;
+  --cyan-700: #0E7490;
+  --cyan-800: #155E75;
+  --cyan-900: #164E63;
+  
+  /* Background (Premium Dark) */
+  --bg-space: #0C0F14;      /* Main background */
+  --bg-panel: #12161D;      /* Card background */
+  --bg-elevated: #1A1F28;   /* Elevated elements */
+  --bg-surface: #232A36;    /* Surface elements */
+  --bg-overlay: rgba(12, 15, 20, 0.95);
   
   /* Neutral Colors (Space Gray) */
   --neutral-50: #E8EAED;
