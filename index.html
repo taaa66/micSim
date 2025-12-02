@@ -20,7 +20,11 @@
     <meta name="format-detection" content="telephone=no" />
     
     <!-- SEO & Description -->
-    <meta name="description" content="Ophthalmic Surgical Simulator - Advanced microsurgery training platform" />
+    <meta name="description" content="OphthalmoSim+ - Next-generation ophthalmic surgical training and OKAP preparation platform" />
+    <meta name="keywords" content="ophthalmology, surgical training, OKAP, medical education, simulation" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
     
     <!-- Icons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -30,7 +34,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
-    <title>Ophthalmic Simulator</title>
+    <title>OphthalmoSim+ | Surgical Training Platform</title>
     
     <!-- Inline critical CSS for fast first paint -->
     <style>
@@ -65,5 +69,20 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

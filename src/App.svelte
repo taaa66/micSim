@@ -21,7 +21,13 @@
 
   // OKAP Knowledge Games
   import { OKAPGamesHub } from './components/okap';
-  import { VergenceGame, CN3Game, EOMGame, DrugMoAGame, ISNTGame, ChemicalBurnGame } from './components/okap/games';
+  import { 
+    VergenceGame, VertexDistanceGame, PrenticeRuleGame, SphericalEquivalentGame, MagnificationGame,
+    TriadGame, VisualPathwayGame, CN3Game, EOMGame, VFDefectGame,
+    DrugMoAGame, SideEffectsGame, ContraindicationsGame, PupilEffectsGame,
+    ISNTGame, GonioscopyGame, DRClassificationGame,
+    VAConverterGame, ChemicalBurnGame
+  } from './components/okap/games';
 
   // Authentication
   import AuthScreen from './components/AuthScreen.svelte';
@@ -74,13 +80,32 @@
     'nano-grip': NanoGripGauntlet
   };
 
-  // OKAP Game Components mapping
+  // OKAP Game Components mapping - ALL 20 GAMES
   const okapGameComponents = {
+    // Optics (O1-O5)
     'O1': VergenceGame,
+    'O2': VertexDistanceGame,
+    'O3': PrenticeRuleGame,
+    'O4': SphericalEquivalentGame,
+    'O5': MagnificationGame,
+    // Neuro (N1-N5)
+    'N1': TriadGame,
+    'N2': VisualPathwayGame,
     'N3': CN3Game,
     'N4': EOMGame,
+    'N5': VFDefectGame,
+    // Pharmacology (P1-P4)
     'P1': DrugMoAGame,
+    'P2': SideEffectsGame,
+    'P3': ContraindicationsGame,
+    'P4': PupilEffectsGame,
+    // Classifications (C1-C4)
     'C1': ISNTGame,
+    'C2': ISNTGame, // T-thinnest uses same mechanic
+    'C3': GonioscopyGame,
+    'C4': DRClassificationGame,
+    // Emergency (E1-E2)
+    'E1': VAConverterGame,
     'E2': ChemicalBurnGame
   };
 
