@@ -19,6 +19,10 @@
   import VectorRace from './components/games/VectorRace.svelte';
   import NanoGripGauntlet from './components/games/NanoGripGauntlet.svelte';
 
+  // OKAP Knowledge Games
+  import { OKAPGamesHub } from './components/okap';
+  import { VergenceGame, CN3Game, EOMGame, DrugMoAGame, ISNTGame, ChemicalBurnGame } from './components/okap/games';
+
   // Authentication
   import AuthScreen from './components/AuthScreen.svelte';
   import UserPanel from './components/UserPanel.svelte';
@@ -32,6 +36,7 @@
   let userPanelOpen = false;
   let selectedSim = null;
   let selectedGame = null;
+  let selectedOkapGame = null;
   let apexPanelOpen = true;
   let activeModule = null; // Dynamic context for Apex League
   let showTraceLine = false;
@@ -69,6 +74,16 @@
     'nano-grip': NanoGripGauntlet
   };
 
+  // OKAP Game Components mapping
+  const okapGameComponents = {
+    'O1': VergenceGame,
+    'N3': CN3Game,
+    'N4': EOMGame,
+    'P1': DrugMoAGame,
+    'C1': ISNTGame,
+    'E2': ChemicalBurnGame
+  };
+
   function handleSelect(e) {
     selectedSim = e.detail;
     currentView = 'sim';
@@ -76,6 +91,31 @@
 
   function handleCoreGames() {
     currentView = 'core-games';
+  }
+
+  function handleOkapGames() {
+    currentView = 'okap-hub';
+  }
+
+  function handleSelectOkapGame(game) {
+    selectedOkapGame = game;
+    currentView = 'okap-game';
+  }
+
+  function handleOkapGameComplete(result) {
+    console.log('OKAP Game complete:', result);
+    const score = result?.score || 0;
+    const duration = result?.avgTimeMs ? (result.avgTimeMs * result.total / 1000) : 60;
+    
+    if (selectedOkapGame) {
+      updateUserStats(score, `okap-${selectedOkapGame.id}`);
+      recordSession(`okap-${selectedOkapGame.id}`, score, duration, {
+        accuracy: result?.accuracy,
+        correct: result?.correct,
+        total: result?.total,
+        grade: result?.grade
+      });
+    }
   }
 
   function handleSelectGame(e) {
@@ -98,6 +138,12 @@
     currentView = 'dashboard';
     selectedSim = null;
     selectedGame = null;
+    selectedOkapGame = null;
+  }
+
+  function handleBackFromOkapGame() {
+    currentView = 'okap-hub';
+    selectedOkapGame = null;
   }
 
   function handleComplete(result) {
@@ -155,6 +201,7 @@
         on:select={handleSelect} 
         on:moduleHover={handleModuleHover}
         on:coreGames={handleCoreGames}
+        on:okapGames={handleOkapGames}
       />
       
       <!-- Apex Panel - overlay on mobile/tablet -->
@@ -185,6 +232,17 @@
     />
   {:else if currentView === 'analytics'}
     <AnalyticsDashboard onBack={handleBackToDashboard} />
+  {:else if currentView === 'okap-hub'}
+    <OKAPGamesHub 
+      onBack={handleBackToDashboard}
+      onSelectGame={handleSelectOkapGame}
+    />
+  {:else if currentView === 'okap-game' && selectedOkapGame}
+    <svelte:component
+      this={okapGameComponents[selectedOkapGame.id]}
+      onComplete={handleOkapGameComplete}
+      onBack={handleBackFromOkapGame}
+    />
   {/if}
   </div>
 {/if}

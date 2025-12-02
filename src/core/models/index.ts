@@ -229,3 +229,153 @@ export interface IPaginatedResponse<T> extends IApiResponse<T[]> {
     totalPages: number;
   };
 }
+
+// =============================================================================
+// AI COACHING MODELS (V15.0)
+// =============================================================================
+
+export interface IAICoachingFeedback {
+  id: string;
+  type: 'tip' | 'warning' | 'encouragement' | 'correction';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  messageHe: string;
+  category: 'tremor' | 'speed' | 'pressure' | 'path' | 'technique' | 'general';
+  timestamp: number;
+  dismissed: boolean;
+}
+
+export interface IAIRecommendation {
+  id: string;
+  title: string;
+  titleHe: string;
+  description: string;
+  descriptionHe: string;
+  priority: number;
+  category: 'exercise' | 'technique' | 'rest' | 'difficulty' | 'focus';
+  actionable: boolean;
+  targetMetric?: string;
+}
+
+export interface IAIErrorPrediction {
+  type: string;
+  probability: number;
+  timeToOccurrence: number;
+  preventionTip: string;
+  preventionTipHe: string;
+}
+
+export interface IAIDifficultyLevel {
+  level: number;
+  name: string;
+  nameHe: string;
+  tolerances: {
+    pathDeviation: number;
+    tremorThreshold: number;
+    speedRange: [number, number];
+    pressureRange: [number, number];
+    timeLimit: number;
+  };
+}
+
+export interface IAIPerformancePattern {
+  type: 'tremor' | 'speed' | 'pressure' | 'accuracy' | 'consistency';
+  severity: 'low' | 'medium' | 'high';
+  frequency: number;
+  lastOccurrence: number;
+  trend: 'improving' | 'stable' | 'declining';
+}
+
+export interface IAISessionAnalytics {
+  sessionId: string;
+  moduleId: string;
+  startTime: number;
+  metrics: {
+    avgTremor: number;
+    avgSpeed: number;
+    avgPressure: number;
+    pathAccuracy: number;
+    consistency: number;
+  };
+  patterns: IAIPerformancePattern[];
+  feedbackHistory: IAICoachingFeedback[];
+  difficultyProgression: number[];
+}
+
+// =============================================================================
+// HAPTIC FEEDBACK MODELS (V15.0)
+// =============================================================================
+
+export interface IStylusState {
+  isConnected: boolean;
+  type: 'apple-pencil' | 'stylus' | 'touch' | 'mouse' | 'unknown';
+  pressure: number;
+  tiltX: number;
+  tiltY: number;
+  azimuth: number;
+  altitude: number;
+  twist: number;
+  isEraser: boolean;
+  supportsForce: boolean;
+  supportsTilt: boolean;
+  supportsAzimuth: boolean;
+}
+
+export interface IForceProfile {
+  id: string;
+  name: string;
+  nameHe: string;
+  baseResistance: number;
+  elasticity: number;
+  viscosity: number;
+  breakThreshold: number;
+  healRate: number;
+}
+
+export interface ITextureProfile {
+  id: string;
+  name: string;
+  nameHe: string;
+  roughness: number;
+  granularity: number;
+  amplitude: number;
+  pattern: 'smooth' | 'bumpy' | 'fibrous' | 'granular' | 'layered';
+}
+
+export interface IVibrationPattern {
+  id: string;
+  name: string;
+  pattern: number[];
+  intensity: number;
+  frequency: number;
+}
+
+export interface IForceFeedbackState {
+  currentForce: number;
+  targetForce: number;
+  deformation: number;
+  isBreaking: boolean;
+  isBroken: boolean;
+  direction: { x: number; y: number };
+}
+
+export interface IHapticEvent {
+  type: 'force' | 'texture' | 'vibration' | 'impact';
+  intensity: number;
+  duration: number;
+  pattern?: IVibrationPattern;
+  force?: IForceProfile;
+  texture?: ITextureProfile;
+  position: { x: number; y: number };
+  timestamp: number;
+}
+
+export interface IHapticCapabilities {
+  supportsVibration: boolean;
+  supportsForceTouch: boolean;
+  supportsPressure: boolean;
+  supportsTilt: boolean;
+  supportsAzimuth: boolean;
+  maxVibrationDuration: number;
+  vibrationPatternSupport: boolean;
+}

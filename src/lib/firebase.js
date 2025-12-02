@@ -87,10 +87,12 @@ export async function firebaseRegister(idNumber, doctorNumber, fullName, special
   // Create pseudo-email from ID number
   const email = `${idNumber}@ophthalmo.sim`;
   
+  let user = null;
+  
   try {
     // Create auth user
     const userCredential = await createUserWithEmailAndPassword(auth, email, doctorNumber);
-    const user = userCredential.user;
+    user = userCredential.user;
     
     // Update display name
     await updateProfile(user, { displayName: fullName });
@@ -112,11 +114,27 @@ export async function firebaseRegister(idNumber, doctorNumber, fullName, special
       }
     };
     
+    // CRITICAL: Create Firestore document BEFORE returning
+    // This prevents race condition with onAuthStateChanged
     await setDoc(doc(db, 'users', user.uid), userProfile);
     
+    // Verify the document was created
+    const verifyDoc = await getDoc(doc(db, 'users', user.uid));
+    if (!verifyDoc.exists()) {
+      console.error('❌ Firestore document not created after setDoc');
+      throw new Error('Failed to create user profile');
+    }
+    
+    console.log('✅ Registration complete, Firestore document verified');
     return { success: true, user: userProfile };
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // If auth user was created but Firestore failed, we have a partial registration
+    // The onAuthChange handler will create a basic profile as fallback
+    if (user && error.code !== 'auth/email-already-in-use') {
+      console.warn('⚠️ Partial registration - auth user created but Firestore may have failed');
+    }
     
     // Translate Firebase errors to Hebrew
     const errorMessages = {
@@ -220,8 +238,51 @@ export function onAuthChange(callback) {
   
   return onAuthStateChanged(auth, async (user) => {
     if (user) {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      callback(userDoc.exists() ? userDoc.data() : null);
+      // Retry logic for race condition during registration
+      // The Firestore document might not exist yet right after registration
+      let retries = 3;
+      let userDoc = null;
+      
+      while (retries > 0) {
+        userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          break;
+        }
+        // Wait a bit before retrying (document might still be creating)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        retries--;
+      }
+      
+      if (userDoc && userDoc.exists()) {
+        callback(userDoc.data());
+      } else {
+        // If still no document after retries, create a basic profile
+        // This handles edge cases where registration partially failed
+        console.warn('⚠️ User profile not found, creating basic profile');
+        const basicProfile = {
+          uid: user.uid,
+          idNumber: user.email?.replace('@ophthalmo.sim', '') || '',
+          fullName: user.displayName || 'משתמש',
+          specialty: 'רופא עיניים',
+          createdAt: new Date().toISOString(),
+          stats: {
+            totalSessions: 0,
+            totalScore: 0,
+            averageScore: 0,
+            highestScore: 0,
+            modulesCompleted: [],
+            lastActive: new Date().toISOString()
+          }
+        };
+        
+        try {
+          await setDoc(doc(db, 'users', user.uid), basicProfile);
+          callback(basicProfile);
+        } catch (error) {
+          console.error('❌ Failed to create basic profile:', error);
+          callback(null);
+        }
+      }
     } else {
       callback(null);
     }
@@ -377,8 +438,8 @@ export async function getUserProgress(uid) {
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      console.log('Creating new user progress document');
-      // Initialize new user with default progress
+      console.log('⚠️ User document not found, returning default progress');
+      // Return default progress - document will be created by onAuthChange if needed
       const defaultProgress = {
         practice_count: 0,
         totalSessions: 0,
@@ -386,10 +447,9 @@ export async function getUserProgress(uid) {
         averageScore: 0,
         highestScore: 0,
         modulesCompleted: [],
-        lastActive: serverTimestamp()
+        lastActive: null
       };
       
-      await updateDoc(userRef, { stats: defaultProgress });
       return defaultProgress;
     }
     

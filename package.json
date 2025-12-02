@@ -1,9 +1,27 @@
 {
-  "name": "ophthalmo-sim",
+  "name": "ophthalmosim-plus",
   "private": true,
   "version": "14.0.0",
   "type": "module",
-  "description": "Ophthalmic Surgical Simulator - Enterprise-grade training application",
+  "description": "OphthalmoSim+ — Next-generation ophthalmic surgical training and OKAP preparation platform. Combines motor skill simulators, gamified training, and active-recall knowledge games to prepare ophthalmology residents for surgical excellence and board examinations.",
+  "author": "OphthalmoSim+ Team",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/your-org/ophthalmosim-plus#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/ophthalmosim-plus.git"
+  },
+  "keywords": [
+    "ophthalmology",
+    "surgical-simulation",
+    "medical-education",
+    "OKAP",
+    "residency-training",
+    "motor-skills",
+    "gamification",
+    "svelte",
+    "healthcare"
+  ],
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",

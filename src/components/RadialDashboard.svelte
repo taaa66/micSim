@@ -395,6 +395,15 @@
     </button>
   {/if}
 
+  <!-- OKAP Knowledge Games Button -->
+  {#if bootPhase >= 4}
+    <button class="okap-games-btn" on:click={() => dispatch('okapGames')} in:fly={{ x: 50, duration: 400, easing: cubicOut }}>
+      <span class="cg-icon">📚</span>
+      <span class="cg-text">OKAP PREP</span>
+      <span class="cg-subtitle">Knowledge Games</span>
+    </button>
+  {/if}
+
   <!-- Footer with slide-up animation -->
   {#if bootPhase >= 4}
     <footer class="footer" in:fly={{ y: 50, duration: 300, easing: cubicOut }}>
@@ -1303,6 +1312,42 @@
     }
     .cg-icon {
       font-size: 1.3rem;
+    }
+  }
+
+  /* OKAP Games Button */
+  .okap-games-btn {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: calc(60px + env(safe-area-inset-bottom));
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+  }
+  .okap-games-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.25) 0%, rgba(168, 85, 247, 0.2) 100%);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+  }
+  .okap-games-btn .cg-text {
+    color: #a855f7;
+  }
+  
+  @media (max-width: 768px) {
+    .okap-games-btn {
+      right: max(16px, env(safe-area-inset-right));
+      bottom: calc(130px + env(safe-area-inset-bottom));
+      padding: 10px 14px;
     }
   }
 </style>
