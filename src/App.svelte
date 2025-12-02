@@ -41,6 +41,16 @@
   // Rota Management
   import { RotaHub } from './modules/rota';
 
+  // UI Components
+  import { ToastContainer } from './components/ui';
+  import { toasts } from './stores/toast';
+  import SettingsModal from './components/SettingsModal.svelte';
+  
+  // Services
+  import { initKeyboardShortcuts, registerDefaultShortcuts } from './lib/keyboardShortcuts';
+  import { initA11yPreferences, announce } from './lib/accessibility';
+  import { onMount, onDestroy } from 'svelte';
+
   let currentView = 'dashboard';
   let userPanelOpen = false;
   let selectedSim = null;
@@ -49,6 +59,35 @@
   let apexPanelOpen = true;
   let activeModule = null; // Dynamic context for Apex League
   let showTraceLine = false;
+  let cleanupShortcuts = null;
+  let cleanupKeyboard = null;
+  let settingsOpen = false;
+  
+  // Initialize services on mount
+  onMount(() => {
+    initA11yPreferences();
+    cleanupKeyboard = initKeyboardShortcuts();
+    
+    // Register default shortcuts
+    cleanupShortcuts = registerDefaultShortcuts({
+      goToDashboard: handleBackToDashboard,
+      goBack: handleBack,
+      openAnalytics: handleOpenAnalytics,
+      openSettings: () => { settingsOpen = true; },
+      toggleFullscreen: () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      }
+    });
+  });
+  
+  onDestroy(() => {
+    cleanupShortcuts?.();
+    cleanupKeyboard?.();  
+  });
   
   function handleModuleHover(e) {
     if (e.detail) {
@@ -192,6 +231,15 @@
         speed: result?.speed,
         consistency: result?.consistency
       });
+      
+      // Show completion toast
+      if (score >= 80) {
+        toasts.success(`מעולה! השגת ${score} נקודות 🎯`);
+      } else if (score >= 60) {
+        toasts.info(`סיימת עם ${score} נקודות. המשך להתאמן!`);
+      } else {
+        toasts.warning(`${score} נקודות. נסה שוב לשיפור!`);
+      }
     }
   }
 
@@ -208,6 +256,8 @@
         accuracy: result?.accuracy,
         speed: result?.speed
       });
+      
+      toasts.success(`משחק הושלם! ${score} נקודות 🎮`);
     }
   }
 
@@ -217,6 +267,8 @@
 
   function handleAuthenticated(e) {
     console.log('User authenticated:', e.detail?.fullName || e.detail);
+    toasts.success(`ברוך הבא, ${e.detail?.fullName || 'משתמש'}!`);
+    announce(`התחברת בהצלחה`);
   }
 </script>
 
@@ -284,6 +336,12 @@
   {/if}
   </div>
 {/if}
+
+<!-- Global Toast Notifications -->
+<ToastContainer position="top-right" />
+
+<!-- Settings Modal -->
+<SettingsModal bind:open={settingsOpen} />
 
 <style>
   /* App container - full viewport */
