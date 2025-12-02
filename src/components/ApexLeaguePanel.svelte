@@ -1099,20 +1099,21 @@
     }
   }
   
-  /* Mobile - panel becomes bottom sheet */
+  /* Mobile - panel becomes collapsible bottom sheet */
   @media (max-width: 768px) {
     .apex-panel {
       top: auto;
       left: max(8px, env(safe-area-inset-left));
       right: max(8px, env(safe-area-inset-right));
-      bottom: max(8px, env(safe-area-inset-bottom));
+      bottom: calc(70px + env(safe-area-inset-bottom)); /* Above quick access */
       width: auto;
-      max-height: 50vh;
-      border-radius: 12px 12px 10px 10px;
+      max-height: 40vh;
+      border-radius: 16px;
+      clip-path: none;
     }
     
     .panel-header {
-      padding: 12px 16px;
+      padding: 10px 14px;
     }
     
     .logo-container {
@@ -1120,33 +1121,59 @@
     }
     
     .league-title {
-      font-size: 12px;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+    
+    .league-subtitle {
+      font-size: 8px;
     }
     
     .status-row {
       flex-wrap: nowrap;
       overflow-x: auto;
-      gap: 8px;
+      gap: 6px;
+      padding: 6px 0;
+    }
+    
+    .status-badge {
+      padding: 4px 8px;
+      font-size: 8px;
     }
     
     .grid-header,
     .grid-row {
-      grid-template-columns: 35px 1fr 55px 65px 55px;
-      font-size: 9px;
-      padding: 8px 10px;
+      grid-template-columns: 30px 1fr 50px 55px;
+      font-size: 8px;
+      padding: 6px 10px;
+    }
+    
+    .col-metric {
+      display: none;
     }
     
     .leaderboard-section,
     .allocation-section {
-      padding: 12px 16px;
+      padding: 10px 14px;
     }
     
     .allocation-display {
-      padding: 12px;
+      padding: 10px;
+    }
+    
+    .allocation-section {
+      display: none; /* Hide allocation on mobile to save space */
     }
     
     .finalize-btn {
-      padding: 10px 16px;
+      padding: 8px 14px;
+      font-size: 10px;
+    }
+    
+    .minimize-btn {
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
     }
   }
   

@@ -638,11 +638,61 @@
   @media (max-width: 767px) {
     .main-container {
       margin-right: 0;
-      --radius: min(32vw, 28vh, 140px);
+      --radius: min(28vw, 32vh, 130px);
+      padding-bottom: 180px; /* Space for quick access */
     }
     .dashboard {
-      --card-size: min(56px, 14vw);
+      --card-size: min(52px, 13vw);
+      padding: 8px;
     }
+    
+    /* Mobile Header */
+    .header {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .header-left {
+      order: 1;
+    }
+    .header-center {
+      order: 3;
+      width: 100%;
+      padding-top: 4px;
+    }
+    .header-right {
+      order: 2;
+      margin-left: auto;
+    }
+    .brand-logo {
+      gap: 6px;
+    }
+    .brand-logo :global(svg) {
+      width: 22px !important;
+      height: 22px !important;
+    }
+    .brand-mark {
+      font-size: 0.9rem;
+    }
+    .brand-title {
+      font-size: 1rem;
+    }
+    .brand-tagline {
+      font-size: 0.65rem;
+    }
+    .header-status {
+      padding: 4px 8px;
+    }
+    .status-text {
+      font-size: 0.6rem;
+    }
+    .header-avatar {
+      width: 32px;
+      height: 32px;
+    }
+    
     .card-name {
       font-size: clamp(5px, 2vw, 7px);
       -webkit-line-clamp: 1;
@@ -1416,15 +1466,71 @@
   
   @media (max-width: 768px) {
     .quick-access-panel {
-      flex-direction: column;
-      width: calc(100% - 32px);
-      max-width: 320px;
-      bottom: calc(70px + env(safe-area-inset-bottom));
+      flex-direction: row;
+      flex-wrap: nowrap;
+      width: calc(100% - 24px);
+      max-width: none;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      padding: 6px;
+      gap: 6px;
+      border-radius: 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .quick-access-panel::-webkit-scrollbar {
+      display: none;
     }
     
     .quick-card {
-      min-width: auto;
-      width: 100%;
+      min-width: 100px;
+      flex: 1;
+      padding: 10px 12px;
+      gap: 8px;
+    }
+    
+    .quick-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+      border-radius: 8px;
+    }
+    
+    .quick-content {
+      gap: 1px;
+    }
+    
+    .quick-title {
+      font-size: 0.75rem;
+    }
+    
+    .quick-desc {
+      font-size: 0.6rem;
+      display: none; /* Hide on very small screens */
+    }
+    
+    .quick-arrow {
+      display: none;
+    }
+  }
+  
+  /* Very small phones */
+  @media (max-width: 400px) {
+    .quick-access-panel {
+      gap: 4px;
+      padding: 4px;
+    }
+    .quick-card {
+      min-width: 85px;
+      padding: 8px 10px;
+    }
+    .quick-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 0.9rem;
+    }
+    .quick-title {
+      font-size: 0.7rem;
     }
   }
   </style>
