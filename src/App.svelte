@@ -42,7 +42,7 @@
   import { RotaHub } from './modules/rota';
 
   // UI Components
-  import { ToastContainer, AchievementPopup } from './components/ui';
+  import { ToastContainer, AchievementPopup, LevelUpPopup } from './components/ui';
   import { toasts } from './stores/toast';
   import SettingsModal from './components/SettingsModal.svelte';
   
@@ -55,6 +55,14 @@
     ACHIEVEMENTS
   } from './stores/achievements';
   import { celebrationBurst } from './lib/confetti';
+  
+  // Streak & Level
+  import { 
+    initStreakAndLevel, 
+    recordDailyActivity, 
+    addXP,
+    levelData
+  } from './stores/streak';
   
   // Services
   import { initKeyboardShortcuts, registerDefaultShortcuts } from './lib/keyboardShortcuts';
@@ -73,13 +81,21 @@
   let cleanupKeyboard = null;
   let settingsOpen = false;
   let currentAchievement = null;
+  let levelUpData = null;
   
   // Initialize services on mount
   onMount(() => {
     initA11yPreferences();
     initAchievements();
+    initStreakAndLevel();
     checkTimeAchievements();
     cleanupKeyboard = initKeyboardShortcuts();
+    
+    // Record daily activity
+    const { streakIncreased, newStreak } = recordDailyActivity();
+    if (streakIncreased && newStreak > 1) {
+      toasts.info(`🔥 רצף של ${newStreak} ימים!`);
+    }
     
     // Check for pending achievement notifications
     checkPendingAchievements();
@@ -288,6 +304,14 @@
       if (unlocked.length > 0) {
         setTimeout(checkPendingAchievements, 1000);
       }
+      
+      // Award XP based on score
+      const xpEarned = Math.round(score * 0.5) + 10;
+      const { leveledUp, newLevel } = addXP(xpEarned);
+      
+      if (leveledUp) {
+        levelUpData = { level: newLevel, title: $levelData.titleHe };
+      }
     }
   }
 
@@ -311,6 +335,14 @@
       // Track achievements
       incrementProgress('games_won', 1);
       setTimeout(checkPendingAchievements, 1000);
+      
+      // Award XP
+      const xpEarned = Math.round(score * 0.3) + 5;
+      const { leveledUp, newLevel } = addXP(xpEarned);
+      
+      if (leveledUp) {
+        levelUpData = { level: newLevel, title: $levelData.titleHe };
+      }
     }
   }
 
@@ -405,6 +437,15 @@
     rarity={currentAchievement.rarity}
     xp={currentAchievement.xp}
     onClose={handleAchievementClose}
+  />
+{/if}
+
+<!-- Level Up Popup -->
+{#if levelUpData}
+  <LevelUpPopup
+    level={levelUpData.level}
+    title={levelUpData.title}
+    onClose={() => levelUpData = null}
   />
 {/if}
 
